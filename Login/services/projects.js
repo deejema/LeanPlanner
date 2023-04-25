@@ -10,7 +10,7 @@ class ProjectGenerationService {
     saveToCSV(projectName, port) {
         const csv = `${projectName},${this.ec2BaseUrl}:${port}\n`;
         try {
-            fs.appendFileSync(`./${filename}`, csv);
+            fs.appendFileSync(`./${this.file}`, csv);
         } catch(err) {
             console.error('Err with saving to CSV: ', err)
         }
@@ -18,10 +18,11 @@ class ProjectGenerationService {
 
     readCSV() {
         try {
-            const data = fs.readFileSync(`./${filename}`, 'utf8');
+            const data = fs.readFileSync(`./${this.file}`, 'utf8');
 
             return data;
         } catch (err) {
+            fs.appendFileSync(`./${this.file}`, '');
             console.log('Error with reading CSV: ', err)
         }
     }

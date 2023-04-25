@@ -5,18 +5,36 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const users = require('./data').userDB;
 const config = require('./config').config;
-const fs = require('fs');
+const fileUpload = require('express-fileupload');
+const {exec} = require('child_process');
+exec("dir", (error, stdout, stderr) => {
+    if (error) {
+        console.log(`error: ${error.message}`);
+        return;
+    }
+    if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        return;
+    }
+    console.log(`stdout: ${stdout}`);
+});
+// Services
+const ProjectGenerationService = require('./services/projects').ProjectGenerationService;
 
+let projects = new ProjectGenerationService(config.urlBase, config.urlFiles);
+console.log('csv', projects.readCSV());
 const app = express();
 const server = http.createServer(app);
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, './public')));
-
+app.use(fileUpload());
 app.get('/', (req, res) => {
+    console.log('./ called')
     res.sendFile(path.join(__dirname, './public/index.html'));
 })
 
 app.post('/register', async(req, res)=> {
+    console.log('register')
     try {
         let foundUser = users.find((data) => req.body.email === data.email);
         if (!foundUser) {
@@ -40,6 +58,7 @@ app.post('/register', async(req, res)=> {
 })
 
 app.post('/login', async(req, res) => {
+    console.log('login')
     try{ 
         let foundUser = users.find((data) => req.body.username === data.username);
         
@@ -51,7 +70,17 @@ app.post('/login', async(req, res) => {
             const passwordMatch = await bcrypt.compare(submittedPass, storedPass);
             if (passwordMatch) {
                 let userName = foundUser.username;
-
+                let data = projects.readCSV();
+                // Process data
+                let processedData1 = data.split('\n');
+                console.log('processedData1', processedData1)
+                let processedData = processedData1.map((line) => {
+                    let stringsplit = line.split(',');
+                    console.log('line', line, stringsplit);
+                    if (line === '') { return ''}
+                    return `<label> ${stringsplit[0]} </label> <a href="${stringsplit[1].trim()}">x</a><br>`
+                })
+                console.log(processedData);
                 res.send(`
                 <div align ='center'>
                     <h2>Login successful</h2>
@@ -59,12 +88,22 @@ app.post('/login', async(req, res) => {
                 <br><br><br>
                 <div align ='center'>
                     <h3>Hello ${userName}</h3>
+                    <div>
+                    ${processedData}
+                    </div>
+                </div>
+                <br><br>
+                <div align='center'>
+
+                <form method="POST" action="/upload" enctype="multipart/form-data">
+                    <input type="file" name="myFile" />
+                    <input type="submit" />
+                </form>
                 </div>
                 <br><br>
                 <div align='center'>
                     <a href='./login.html'>logout</a>
                 </div>`);
-                res.sendFile()
             } else {
                 res.send("<div align ='center'><h2>Invalid email or password</h2></div><br><br><div align ='center'><a href='./login.html'>login again</a></div>");
             }
@@ -79,6 +118,24 @@ app.post('/login', async(req, res) => {
     }
 })
 
+app.post('/upload', async(req, res) => {
+    console.log('upload');
+    
+    if (!req.files) {
+        return res.status(400).send("No files were uploaded.");
+      }
+    const file = req.files.myFile;
+    const path = __dirname + "/files/" + file.name;
+
+    projects.saveToCSV(file.name, 1234);
+    file.mv(path, (err) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        return res.send({ status: "success", path: path });
+    });
+    console.log(file);
+})
 server.listen(config.port, function() {
     console.log('Server is listening on port: ', config.port)
 })
