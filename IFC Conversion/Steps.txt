@@ -1,0 +1,6 @@
+1.) Need AWS credentials
+2.) Receive IFC file
+3.) Convert IFC file to GLB files using the command
+4.) Create new forge bucket under forge credentials
+5.) Call APIs to upload GLB files and translate it
+6.) Get translated URN after uploading
