@@ -1,0 +1,1 @@
+sudo find "/home/ubuntu/Lean/LeanPlanner/IFC Conversion" -maxdepth 1 -name "*.ifc" -exec echo {} \;
