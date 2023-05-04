@@ -1,1 +1,1 @@
-sudo find "/home/ubuntu/Lean/LeanPlanner/IFC Conversion" -maxdepth 1 -name "*.ifc" -exec echo {} \;
+sudo find "/home/ubuntu/Lean/LeanPlanner/IFCConversion" -maxdepth 1 -name "*.ifc" -exec ./IfcConvert --use-element-guids --strict-tolerance -j 4 {} {}.glb \;

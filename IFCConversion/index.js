@@ -23,9 +23,10 @@ if (!config.client_id || !config.client_secret) {
 let configurations = {}; // Used to keep track of additional config
 
 // Run ICC to GLB Converter
-console.log(`Running ICC to GLB Conversion BAT file`)
-const ls = spawn("ICC_to_GLB", [], {shell:true});
-
+// console.log(`Running ICC to GLB Conversion BAT file`)
+// const ls = spawn("ICC_to_GLB", [], {shell:true});
+console.log('Running IFC TO GLB SCRIPT');
+const ls = spawn("./scriptToGlb", [], {shell:true});
 ls.stdout.on("data", data => {
     console.log(`stdout: ${data}`);
 });
@@ -244,7 +245,8 @@ function translateIFCToJson() {
 
 function ifcToJson(file, fileOutput) {
     console.log(`Translating ${file} to ${fileOutput}`)
-    const cmdline = `xeokit-metadata ${file} ${fileOutput}`
+    // const cmdline = `xeokit-metadata ${file} ${fileOutput}`
+    const cmdline = `./xeokit-metadata-linux-x64/xeokit-metadata ${file} ${fileOutput}`
     let cmd = spawn(cmdline, [], {shell:true});
     cmd.stdout.on("data", data => {
         console.log(`stdout: ${data}`);
