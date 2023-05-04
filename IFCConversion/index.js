@@ -290,3 +290,8 @@ function ifcToJson(file, fileOutput) {
     })
 
 }
+
+function removeAllFiles() {
+    console.log('Removing all IFC, GLB, JSONs');
+    
+}
