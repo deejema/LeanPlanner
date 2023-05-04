@@ -129,6 +129,7 @@ function getAccessToken(url, requestOptions, files) {
 }
 
 function createBucket(url, requestOptions, files) {    
+    console.log('createBucket');
     request(url, requestOptions, function(err, res) {
     if (err) console.log(err);
     try {
@@ -154,6 +155,7 @@ function createBucket(url, requestOptions, files) {
 }
 
 function uploadFile(url, requestOptions, file) {
+    console.log('uploadFile')
     request(url, requestOptions, function(err, res) {
         if (err) console.log(err);
         try{
@@ -190,6 +192,7 @@ function uploadFile(url, requestOptions, file) {
 }
 
 function translateFile(url, requestOptions) {
+    console.log('translateFile')
     request(url, requestOptions, function (err, res) {
         if (err) console.log(err);
         try {
