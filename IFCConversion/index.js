@@ -145,7 +145,7 @@ function createBucket(url, requestOptions, files) {
                 'Content-Type':'application/octet-stream',
                 'Authorization': `Bearer ${configurations.access_token}`
             },
-            body: fs.createReadStream(__dirname + '\\' + files[0])
+            body: fs.createReadStream(__dirname + '/' + files[0])
         }
         uploadFile(url, requestOptions, files[0]);
     } catch (e) {
