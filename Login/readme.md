@@ -1,2 +1,2 @@
-Change Config.js to correct credentials
-Remove all projects in ec2instances.csv
+- Change Config.js to correct credentials
+- Remove all projects in ec2instances.csv
