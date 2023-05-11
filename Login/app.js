@@ -120,12 +120,12 @@ app.post('/upload', async(req, res) => {
     }
 
     // console.log('params', params);
-    // s3.upload(params, (err, data) => {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-    //     console.log(data.Location);
-    // })
+    s3.upload(params, (err, data) => {
+        if (err) {
+            console.log(err);
+        }
+        console.log(data.Location);
+    })
     let resData = resDataForUser(username);
 
     file.mv(path, (err) => {
