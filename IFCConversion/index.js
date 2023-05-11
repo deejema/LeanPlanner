@@ -223,11 +223,20 @@ function checkStatusOfTranslation(url, requestOptions) {
             if (result.progress !== 'complete' ){
                 checkStatusOfTranslation(url, requestOptions);
             } else {
-                fs.writeFile('urns.txt', result.urn, (err) => {
-                    if (err) console.log(err);
-                    else {
-                        console.log('written to urns.txt')
-                    }
+                fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
+                    if (err) throw err;
+                    console.log('Copied template urns.js to source');
+        
+                    fs.readFile('.env', 'utf8', function(err, data) {
+                        if (err) {
+                            return console.log(err);
+                        }
+                        let result = data.replace('<REPLACE_URN>', result.urn);
+                        console.log('res', result)
+                        fs.writeFile('.env', result, 'utf8', function(err) {
+                            if (err) { console.log(err)}
+                        })
+                    })
                 })
                 translateIFCToJson();
             }
