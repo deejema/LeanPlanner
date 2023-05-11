@@ -7,6 +7,8 @@ const users = require('./data').userDB;
 const config = require('./config').config;
 const fileUpload = require('express-fileupload');
 const {exec} = require('child_process');
+const AWS = require('aws-sdk');
+
 exec("dir", (error, stdout, stderr) => {
     if (error) {
         console.log(`error: ${error.message}`);
@@ -22,9 +24,18 @@ exec("dir", (error, stdout, stderr) => {
 const ProjectGenerationService = require('./services/projects').ProjectGenerationService;
 
 let projects = new ProjectGenerationService(config.urlBase, config.urlFiles);
+
 console.log('csv', projects.readCSV());
 const app = express();
 const server = http.createServer(app);
+
+const s3 = new AWS.S3({
+    accessKeyId: config.awsAccessKey,
+    secretAccessKey: config.awsSecretKey
+});
+
+
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, './public')));
 app.use(fileUpload());
@@ -58,7 +69,7 @@ app.post('/register', async(req, res)=> {
 })
 
 app.post('/login', async(req, res) => {
-    console.log('login')
+    console.log('login', req)
     try{ 
         let foundUser = users.find((data) => req.body.username === data.username);
         
@@ -70,40 +81,10 @@ app.post('/login', async(req, res) => {
             const passwordMatch = await bcrypt.compare(submittedPass, storedPass);
             if (passwordMatch) {
                 let userName = foundUser.username;
-                let data = projects.readCSV();
+                
                 // Process data
-                let processedData1 = data.split('\n');
-                console.log('processedData1', processedData1)
-                let processedData = processedData1.map((line) => {
-                    let stringsplit = line.split(',');
-                    console.log('line', line, stringsplit);
-                    if (line === '') { return ''}
-                    return `<label> ${stringsplit[0]} </label> <a href="${stringsplit[1].trim()}">x</a><br>`
-                })
-                console.log(processedData);
-                res.send(`
-                <div align ='center'>
-                    <h2>Login successful</h2>
-                </div>
-                <br><br><br>
-                <div align ='center'>
-                    <h3>Hello ${userName}</h3>
-                    <div>
-                    ${processedData}
-                    </div>
-                </div>
-                <br><br>
-                <div align='center'>
-
-                <form method="POST" action="/upload" enctype="multipart/form-data">
-                    <input type="file" name="myFile" />
-                    <input type="submit" />
-                </form>
-                </div>
-                <br><br>
-                <div align='center'>
-                    <a href='./login.html'>logout</a>
-                </div>`);
+                let resData = resDataForUser(userName);
+                res.send(resData);
             } else {
                 res.send("<div align ='center'><h2>Invalid email or password</h2></div><br><br><div align ='center'><a href='./login.html'>login again</a></div>");
             }
@@ -121,21 +102,89 @@ app.post('/login', async(req, res) => {
 app.post('/upload', async(req, res) => {
     console.log('upload');
     
+    console.log('req', req);
+
     if (!req.files) {
         return res.status(400).send("No files were uploaded.");
-      }
+    }
     const file = req.files.myFile;
     const path = __dirname + "/files/" + file.name;
-
+    const username = req.body.username;
+    
     projects.saveToCSV(file.name, 1234);
+    
+    const params = {
+        Bucket: config.awsBucket,
+        Key: file.name,
+        Body: file.data
+    }
+
+    // console.log('params', params);
+    // s3.upload(params, (err, data) => {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     console.log(data.Location);
+    // })
+    let resData = resDataForUser(username);
+
     file.mv(path, (err) => {
         if (err) {
             return res.status(500).send(err);
         }
-        return res.send({ status: "success", path: path });
+        res.send(resData);
+        // return res.send({ status: "success", path: path });
     });
-    console.log(file);
+    console.log('file: ', file);
 })
 server.listen(config.port, function() {
     console.log('Server is listening on port: ', config.port)
 })
+
+function processData() {
+    let data = projects.readCSV();
+    let processedData1 = data.split('\n');
+    // console.log('processedData1', processedData1)
+    let processedData = processedData1.map((line) => {
+        let stringsplit = line.split(',');
+        // console.log('line', line, stringsplit);
+        if (line === '') { return ''}
+        return `<label> ${stringsplit[0]} </label> <a href="${stringsplit[1].trim()}">x</a><br>`
+    })
+
+    return processedData;
+}
+
+function resDataForUser(userName) {
+    let processedData = processData();
+    console.log('processed data', processedData);
+    return `
+    <div align ='center'>
+        <h2>Login successful</h2>
+    </div>
+    <br><br><br>
+    <div align ='center'>
+        <h3>Hello ${userName}</h3>
+        <div>
+        ${processedData.join('\n')}
+        </div>
+    </div>
+    <br><br>
+    <div align='center'>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <fieldset>
+
+        <input type="file" name="myFile" />
+        <input type="text" id="username" name="username" placeholder="username" style="display:none" value="${userName}" required>
+        <button type="submit">Submit</button>
+
+        </fieldset>
+    </form>
+    </div>
+    <br><br>
+    <div align='center'>
+        <a href='./login.html'>logout</a>
+    </div>`
+    
+}
