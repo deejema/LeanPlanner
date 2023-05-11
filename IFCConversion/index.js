@@ -231,9 +231,9 @@ function checkStatusOfTranslation(url, requestOptions) {
                         if (err) {
                             return console.log(err);
                         }
-                        let result = data.replace('<REPLACE_URN>', result.urn);
-                        console.log('res', result)
-                        fs.writeFile('urns.js', result, 'utf8', function(err) {
+                        let resUrns = data.replace('<REPLACE_URN>', result.urn);
+                        console.log('res', resUrns)
+                        fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
                             if (err) { console.log(err)}
                         })
                     })
