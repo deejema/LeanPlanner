@@ -227,13 +227,13 @@ function checkStatusOfTranslation(url, requestOptions) {
                     if (err) throw err;
                     console.log('Copied template urns.js to source');
         
-                    fs.readFile('.env', 'utf8', function(err, data) {
+                    fs.readFile('urns.js', 'utf8', function(err, data) {
                         if (err) {
                             return console.log(err);
                         }
                         let result = data.replace('<REPLACE_URN>', result.urn);
                         console.log('res', result)
-                        fs.writeFile('.env', result, 'utf8', function(err) {
+                        fs.writeFile('urns.js', result, 'utf8', function(err) {
                             if (err) { console.log(err)}
                         })
                     })
