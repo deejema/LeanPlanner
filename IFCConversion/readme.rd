@@ -1,3 +1,6 @@
+- Required for running:
+	1.) Autodesk Forge API/secret key in config.js
+
 - Need to upload to folder in project:
 	1.) Urns
 	2.) .env file generated
