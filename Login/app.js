@@ -18,14 +18,14 @@ exec("dir", (error, stdout, stderr) => {
         console.log(`stderr: ${stderr}`);
         return;
     }
-    console.log(`stdout: ${stdout}`);
+    // console.log(`stdout: ${stdout}`);
 });
 // Services
 const ProjectGenerationService = require('./services/projects').ProjectGenerationService;
 
-let projects = new ProjectGenerationService(config.urlBase, config.urlFiles);
+let projects = new ProjectGenerationService(config.urlBase, config.urlFiles, config.firstProjectPort, config.maxProjectPort);
 
-console.log('csv', projects.readCSV());
+
 const app = express();
 const server = http.createServer(app);
 
@@ -69,7 +69,7 @@ app.post('/register', async(req, res)=> {
 })
 
 app.post('/login', async(req, res) => {
-    console.log('login', req)
+    console.log('login')
     try{ 
         let foundUser = users.find((data) => req.body.username === data.username);
         
@@ -102,7 +102,7 @@ app.post('/login', async(req, res) => {
 app.post('/upload', async(req, res) => {
     console.log('upload');
     
-    console.log('req', req);
+    // console.log('req', req);
 
     if (!req.files) {
         return res.status(400).send("No files were uploaded.");
@@ -142,15 +142,22 @@ server.listen(config.port, function() {
 })
 
 function processData() {
-    let data = projects.readCSV();
-    let processedData1 = data.split('\n');
-    // console.log('processedData1', processedData1)
-    let processedData = processedData1.map((line) => {
-        let stringsplit = line.split(',');
-        // console.log('line', line, stringsplit);
-        if (line === '') { return ''}
-        return `<label> ${stringsplit[0]} </label> <a href="${stringsplit[1].trim()}">x</a><br>`
-    })
+    let data = projects.getProjects();
+
+    let processedData = [];
+    if (Object.keys(data)) {
+        Object.keys(data).forEach((key) => {
+            processedData.push(`<label> ${data[key]} </label> <a href="${config.urlBase}:${key}">x</a><br>`)
+        });
+    }
+    // let processedData1 = data.split('\n');
+    // // console.log('processedData1', processedData1)
+    // let processedData = processedData1.map((line) => {
+    //     let stringsplit = line.split(',');
+    //     // console.log('line', line, stringsplit);
+    //     if (line === '') { return ''}
+    //     return `<label> ${stringsplit[0]} </label> <a href="${stringsplit[1].trim()}">x</a><br>`
+    // })
 
     return processedData;
 }
