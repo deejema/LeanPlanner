@@ -16,6 +16,7 @@ const AWS = require('aws-sdk');
  * 7.) Replace variable placeholders with actual values
  * 8.) Move .env to correct folder
  */
+const filenames = [];
 console.log(config.client_id, config.client_secret);
 if (!config.client_id || !config.client_secret) {
     console.log('No client id or secret detected');
@@ -48,6 +49,7 @@ ls.on("close", code => {
     //// Find all GLBs in directory
     let files = fromDir('./', /\.glb$/, function(filename) {
         console.log('-- found: ', filename);
+        filenames.push(filename); // GLB
     });
     console.log(files);
 
@@ -88,6 +90,7 @@ function fromDir(startPath, filter, callback) {
         } else if (filter.test(filename)) {
             console.log('filename', filename)
             filelist.push(filename);
+            filenames.push(filename); // IFC
             // callback(filename);
         }
     };
@@ -234,6 +237,7 @@ function checkStatusOfTranslation(url, requestOptions) {
                         }
                         let resUrns = data.replace('<REPLACE_URN>', result.urn);
                         console.log('res', resUrns)
+                        filenames.push('urns.js'); // URNS
                         fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
                             if (err) { console.log(err)}
                         })
@@ -252,6 +256,8 @@ function translateIFCToJson() {
         console.log('-- found: ', filename);
     });
     ifCfiles.forEach(file => {
+        console.log('Replace file to json: ', file.replace('.ifc', '.json'));
+        filenames.push(file.replace('.ifc', '.json')); // JSON
         ifcToJson(file, file.replace('.ifc', '.json'))
     })
 }
@@ -292,19 +298,21 @@ function ifcToJson(file, fileOutput) {
                 result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
                 result = result.replace('<FORGE_PORT>', '3500');
                 console.log('res', result)
+                filenames.push('.env'); // ENV
                 fs.writeFile('.env', result, 'utf8', function(err) {
                     if (err) { console.log(err)}
                 })
             })
         })
+        uploadToS3();
     })
 
 }
 
 function uploadToS3() {
-    
+    console.log('files to upload', filenames);
 }
 function removeAllFiles() {
-    console.log('Removing all IFC, GLB, JSONs');
+    console.log('Removing all IFC, GLB, JSONs, URNS, ENV');
     
 }
