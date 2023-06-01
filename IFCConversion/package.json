@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1389.0",
     "node-libcurl": "^3.0.0",
     "request": "^2.88.2"
   }

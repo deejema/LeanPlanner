@@ -3,7 +3,8 @@ const config = require('./config').config;
 const fs = require('fs');
 const path = require('path')
 const request = require('request');
-const qs = require('querystring')
+const qs = require('querystring');
+const AWS = require('aws-sdk');
 
 /**
  * 1.) Run ICC to GLB Converter
@@ -300,6 +301,9 @@ function ifcToJson(file, fileOutput) {
 
 }
 
+function uploadToS3() {
+    
+}
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs');
     
