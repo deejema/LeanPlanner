@@ -313,8 +313,8 @@ function uploadToS3() {
     removeAllFiles();
 
 }
-function callCmd(cmd) {
-    let cmd = spawn (cmd, [], {shell:true});
+function callCmd(cmdline) {
+    let cmd = spawn (cmdline, [], {shell:true});
     cmd.stdout.on("data", data => {
         console.log(`stdout: ${data}`);
     });
