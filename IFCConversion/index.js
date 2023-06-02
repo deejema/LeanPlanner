@@ -90,7 +90,7 @@ function fromDir(startPath, filter, callback) {
         } else if (filter.test(filename)) {
             console.log('filename', filename)
             filelist.push(filename);
-            filenames.push(filename); // IFC
+            // filenames.push(filename); // IFC
             // callback(filename);
         }
     };
@@ -310,9 +310,34 @@ function ifcToJson(file, fileOutput) {
 }
 
 function uploadToS3() {
-    console.log('files to upload', filenames);
+    removeAllFiles();
+
+}
+function callCmd(cmd) {
+    let cmd = spawn (cmd, [], {shell:true});
+    cmd.stdout.on("data", data => {
+        console.log(`stdout: ${data}`);
+    });
+
+    cmd.stderr.on("data", data => {
+        console.log(`stderr: ${data}`);
+    });
+
+    cmd.on('error', (error) => {
+        console.log(`error: ${error.message}`);
+    });
+    cmd.on("close", code => {
+        console.log(`child process exited with code ${code}`);
+    })
 }
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs, URNS, ENV');
+    
+    console.log('files to upload', filenames);
+    filenames.forEach(file => {
+        const cmd = `rm ${file}`;
+        console.log('cmd: ', cmd)
+        callCmd(cmd);
+    })
     
 }
