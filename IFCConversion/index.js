@@ -301,10 +301,11 @@ function ifcToJson(file, fileOutput) {
                 filenames.push('.env'); // ENV
                 fs.writeFile('.env', result, 'utf8', function(err) {
                     if (err) { console.log(err)}
+                    
+                    uploadToS3();
                 })
             })
         })
-        uploadToS3();
     })
 
 }
