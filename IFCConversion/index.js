@@ -6,6 +6,10 @@ const request = require('request');
 const qs = require('querystring');
 const AWS = require('aws-sdk');
 
+const s3 = new AWS.S3({
+    accessKeyId: config.awsAccessKey,
+    secretAccessKey: config.awsSecretKey
+});
 /**
  * 1.) Run ICC to GLB Converter
  * 2.) After it's done, run apis to set up forge bucket
