@@ -319,6 +319,21 @@ function ifcToJson(file, fileOutput) {
 }
 
 function uploadToS3() {
+    filenames.forEach(file => {
+        const body = fs.readFileSync(file);
+        const params = {
+            Bucket: config.awsBucket,
+            Key: file.name,
+            Body: body
+        }
+        s3.upload(params, (err, data) => {
+            if (err) {
+                console.log(err);
+            }
+            console.log(data);
+        })
+
+    })
     removeAllFiles();
 
 }
