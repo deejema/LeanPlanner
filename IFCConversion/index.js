@@ -49,7 +49,6 @@ ls.on("close", code => {
     //// Find all GLBs in directory
     let files = fromDir('./', /\.glb$/, function(filename) {
         console.log('-- found: ', filename);
-        filenames.push(filename); // GLB
     });
     console.log(files);
 
@@ -98,6 +97,10 @@ function fromDir(startPath, filter, callback) {
 };
 
 function getAccessToken(url, requestOptions, files) {
+    console.log('glb files', files);
+    files.each(file => {
+        filenames.push(file); // glb
+    })
     request(url, requestOptions, function(err, res) {
         if (err) console.log(err);
         try {
