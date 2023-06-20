@@ -98,7 +98,7 @@ function fromDir(startPath, filter, callback) {
 
 function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
-    files.each(file => {
+    files.forEach(file => {
         filenames.push(file); // glb
     })
     request(url, requestOptions, function(err, res) {
