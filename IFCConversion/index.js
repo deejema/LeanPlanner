@@ -323,7 +323,7 @@ function uploadToS3() {
         const body = fs.readFileSync(file);
         const params = {
             Bucket: config.awsBucket,
-            Key: file.name,
+            Key: file,
             Body: body
         }
         s3.upload(params, (err, data) => {
