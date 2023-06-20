@@ -258,6 +258,7 @@ function translateIFCToJson() {
     ifCfiles.forEach(file => {
         console.log('Replace file to json: ', file.replace('.ifc', '.json'));
         filenames.push(file.replace('.ifc', '.json')); // JSON
+        console.log('filenames from json', filenames)
         ifcToJson(file, file.replace('.ifc', '.json'))
     })
 }
