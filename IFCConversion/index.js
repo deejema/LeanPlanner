@@ -10,6 +10,7 @@ const s3 = new AWS.S3({
     accessKeyId: config.awsAccessKey,
     secretAccessKey: config.awsSecretKey
 });
+
 /**
  * 1.) Run ICC to GLB Converter
  * 2.) After it's done, run apis to set up forge bucket
@@ -28,6 +29,9 @@ if (!config.client_id || !config.client_secret) {
 }
 let configurations = {}; // Used to keep track of additional config
 
+if (process.argv.length && process.argv.length == 1) {
+    configurations.port = process.argv[0];
+}
 // Run ICC to GLB Converter
 // console.log(`Running ICC to GLB Conversion BAT file`)
 // const ls = spawn("ICC_to_GLB", [], {shell:true});
@@ -304,7 +308,7 @@ function ifcToJson(file, fileOutput) {
                 result = result.replace('<FORGE_SECRET>', config.client_secret);
                 result = result.replace('<FORGE_BUCKET>', configurations.bucketKey);
                 result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
-                result = result.replace('<FORGE_PORT>', '3500');
+                result = result.replace('<FORGE_PORT>', configurations.port ? configurations.port : '3500');
                 console.log('res', result)
                 filenames.push('.env'); // ENV
                 fs.writeFile('.env', result, 'utf8', function(err) {
