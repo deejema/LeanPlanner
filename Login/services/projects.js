@@ -37,11 +37,10 @@ class ProjectGenerationService {
                     
                     // Make script for post file upload
                     const projectDirectory = `~/Lean/Projects/${port}/`
-                    const script = `echo text\n
-                    cp -r ~/Lean/ForgeTemplate/ ${projectDirectory}\n
-                    mv ~/config.js ${projectDirectory}\n
-                    mv ~/.env ${projectDirectory} \n
-                    mv ~/urns.js ${projectDirectory}wwwroot\n
+                    const script = `echo text
+                    cp -r ~/Lean/ForgeTemplate/ ${projectDirectory}
+                    mv ~/.env ${projectDirectory} 
+                    mv ~/urns.js ${projectDirectory}wwwroot
                     `;
                     fs.writeFileSync('scriptToForge', script);
                     break;
