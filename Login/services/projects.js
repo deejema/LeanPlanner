@@ -40,8 +40,7 @@ class ProjectGenerationService {
                     const script = `echo text
                     cp -r ~/Lean/ForgeTemplate/ ${projectDirectory}
                     mv ~/.env ${projectDirectory} 
-                    mv ~/urns.js ${projectDirectory}wwwroot
-                    `;
+                    mv ~/urns.js ${projectDirectory}wwwroot`;
                     fs.writeFileSync('scriptToForge', script);
                     break;
                 }
