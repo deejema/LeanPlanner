@@ -248,7 +248,7 @@ function checkStatusOfTranslation(url, requestOptions) {
                         }
                         let resUrns = data.replace('<REPLACE_URN>', result.urn);
                         console.log('res', resUrns)
-                        filenames.push('urns.js'); // URNS
+                        // filenames.push('urns.js'); // URNS
                         fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
                             if (err) { console.log(err)}
                         })
@@ -310,7 +310,7 @@ function ifcToJson(file, fileOutput) {
                 result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
                 result = result.replace('<FORGE_PORT>', configurations.port ? configurations.port : '3500');
                 console.log('res', result)
-                filenames.push('.env'); // ENV
+                // filenames.push('.env'); // ENV
                 fs.writeFile('.env', result, 'utf8', function(err) {
                     if (err) { console.log(err)}
                     
@@ -338,7 +338,7 @@ function uploadToS3() {
         })
 
     })
-    // removeAllFiles();
+    removeAllFiles();
 
 }
 function callCmd(cmdline) {
@@ -359,8 +359,8 @@ function callCmd(cmdline) {
     })
 }
 function removeAllFiles() {
-    console.log('Removing all IFC, GLB, JSONs, URNS, ENV');
-    
+    console.log('Removing all IFC, GLB, JSONs, URNS, ENV'); // MVP ONLY REMOVE GLB/IFC/JSON
+    callCmd('./scriptMoveConfigFiles'); // FOR MVP TO MOVE URNS AND ENV FILE
     console.log('files to upload', filenames);
     filenames.forEach(file => {
         const cmd = `rm ${file}`;
