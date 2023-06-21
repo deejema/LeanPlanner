@@ -41,6 +41,7 @@ class ProjectGenerationService {
                     cp -r ~/Lean/ForgeTemplate/ ${projectDirectory}
                     mv ~/.env ${projectDirectory} 
                     mv ~/urns.js ${projectDirectory}wwwroot
+                    cd ${projectDirectory}
                     pm2 start ${projectDirectory}server.js`;
                     fs.writeFileSync('scriptToForge', script);
                     break;
