@@ -29,8 +29,8 @@ if (!config.client_id || !config.client_secret) {
 }
 let configurations = {}; // Used to keep track of additional config
 
-if (process.argv.length && process.argv.length == 1) {
-    configurations.port = process.argv[0];
+if (process.argv.length && process.argv.length == 3) {
+    configurations.port = process.argv[2];
 }
 // Run ICC to GLB Converter
 // console.log(`Running ICC to GLB Conversion BAT file`)
