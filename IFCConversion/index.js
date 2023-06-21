@@ -334,7 +334,7 @@ function uploadToS3() {
         })
 
     })
-    removeAllFiles();
+    // removeAllFiles();
 
 }
 function callCmd(cmdline) {
