@@ -34,6 +34,10 @@ class ProjectGenerationService {
                     const csv = `${projectName},${this.ec2BaseUrl}:${port}\n`;
                     fs.appendFileSync(`./${this.file}`, csv);
                     this.projects[port] = projectName;
+                    
+                    // Make script for post file upload
+                    const script = `text`
+                    fs.writeFileSync('scriptToForge', script);
                     break;
                 }
                 port+=1;
