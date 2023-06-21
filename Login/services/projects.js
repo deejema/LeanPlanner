@@ -37,7 +37,7 @@ class ProjectGenerationService {
                     
                     // Make script for post file upload
                     const projectDirectory = `~/Lean/Projects/${port}/`
-                    const script = `echo text
+                    const script = `echo Copying ForgeTemplate to Folder: ${port} 
                     cp -r ~/Lean/ForgeTemplate/ ${projectDirectory}
                     mv ~/.env ${projectDirectory} 
                     mv ~/urns.js ${projectDirectory}wwwroot
