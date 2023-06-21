@@ -1,0 +1,4 @@
+echo Used to move urns.js and .env for mvp
+mv urns.js ~/
+mv .env ~/
+
