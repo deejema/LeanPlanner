@@ -108,6 +108,7 @@ function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
     files.forEach(file => {
         filenames.push(file); // glb
+        filenames.push(file.replace('.glb', '.xml'))
     })
     request(url, requestOptions, function(err, res) {
         if (err) console.log(err);
