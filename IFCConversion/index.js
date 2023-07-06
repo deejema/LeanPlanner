@@ -122,10 +122,10 @@ function getAccessToken(url, requestOptions, files) {
             // Set up create bucket function
             let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
             let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
-            console.log(files[0])
             configurations.floorDataTable = bucket;
             bucket = bucket.toLowerCase()
-            configurations.bucketKey = bucket.includes(".ifc") ? bucket.replace('.ifc', '') : bucket;
+            console.log('bucket name', bucket)
+            configurations.bucketKey = bucket;
             let requestOptions = {
                 method: 'POST',
                 headers: {
