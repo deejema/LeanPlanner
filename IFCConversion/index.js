@@ -21,7 +21,8 @@ const s3 = new AWS.S3({
  * 7.) Replace variable placeholders with actual values
  * 8.) Move .env to correct folder
  */
-const filenames = [];
+const filetoDelete = []; // GLB
+const filesToMove = []; // XML/JSON
 console.log(config.client_id, config.client_secret);
 if (!config.client_id || !config.client_secret) {
     console.log('No client id or secret detected');
@@ -107,8 +108,8 @@ function fromDir(startPath, filter, callback) {
 function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
     files.forEach(file => {
-        filenames.push(file); // glb
-        filenames.push(file.replace('.glb', '.xml'))
+        filetoDelete.push(file); // glb
+        filesToMove.push(file.replace('.glb', '.xml'))
     })
     request(url, requestOptions, function(err, res) {
         if (err) console.log(err);
@@ -269,8 +270,8 @@ function translateIFCToJson() {
     });
     ifCfiles.forEach(file => {
         console.log('Replace file to json: ', file.replace('.ifc', '.json'));
-        filenames.push(file.replace('.ifc', '.json')); // JSON
-        console.log('filenames from json', filenames)
+        filesToMove.push(file.replace('.ifc', '.json')); // JSON
+        console.log('filenames from json', filetoDelete, filesToMove)
         ifcToJson(file, file.replace('.ifc', '.json'))
     })
 }
@@ -324,7 +325,7 @@ function ifcToJson(file, fileOutput) {
 }
 
 function uploadToS3() {
-    filenames.forEach(file => {
+    filetoDelete.forEach(file => {
         const body = fs.readFileSync(file);
         const params = {
             Bucket: config.awsBucket,
@@ -362,8 +363,8 @@ function callCmd(cmdline) {
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs, URNS, ENV'); // MVP ONLY REMOVE GLB/IFC/JSON
     callCmd('./scriptMoveConfigFiles'); // FOR MVP TO MOVE URNS AND ENV FILE
-    console.log('files to upload', filenames);
-    filenames.forEach(file => {
+    console.log('files to upload', filetoDelete, filesToMove);
+    filetoDelete.forEach(file => {
         const cmd = `rm ${file}`;
         console.log('cmd: ', cmd)
         callCmd(cmd);
