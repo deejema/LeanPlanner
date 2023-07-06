@@ -22,7 +22,7 @@ const s3 = new AWS.S3({
  * 8.) Move .env to correct folder
  */
 const filetoDelete = []; // GLB
-const filesToMove = []; // XML/JSON
+const pythonScriptFiles = []; // XML/JSON
 console.log(config.client_id, config.client_secret);
 if (!config.client_id || !config.client_secret) {
     console.log('No client id or secret detected');
@@ -109,7 +109,7 @@ function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
     files.forEach(file => {
         filetoDelete.push(file); // glb
-        filesToMove.push(file.replace('.glb', '.xml'))
+        pythonScriptFiles.push(file.replace('.glb', '.xml'))
     })
     request(url, requestOptions, function(err, res) {
         if (err) console.log(err);
@@ -270,8 +270,8 @@ function translateIFCToJson() {
     });
     ifCfiles.forEach(file => {
         console.log('Replace file to json: ', file.replace('.ifc', '.json'));
-        filesToMove.push(file.replace('.ifc', '.json')); // JSON
-        console.log('filenames from json', filetoDelete, filesToMove)
+        pythonScriptFiles.push(file.replace('.ifc', '.json')); // JSON
+        console.log('filenames from json', filetoDelete, pythonScriptFiles)
         ifcToJson(file, file.replace('.ifc', '.json'))
     })
 }
@@ -340,6 +340,13 @@ function uploadToS3() {
         })
 
     })
+    
+    // PYTHON SCRIPT HERE THAT DEALS WITH XML AND JSON
+    console.log('DO PYTHON SCRIPT HERE')
+    let pythonCmd = `python3 script.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
+    console.log('PYTHON COMMAND: ', pythonCmd)
+    // callCmd(pythonCmd);
+    
     removeAllFiles();
 
 }
@@ -363,8 +370,14 @@ function callCmd(cmdline) {
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs, URNS, ENV'); // MVP ONLY REMOVE GLB/IFC/JSON
     callCmd('./scriptMoveConfigFiles'); // FOR MVP TO MOVE URNS AND ENV FILE
-    console.log('files to upload', filetoDelete, filesToMove);
+    console.log('files to upload', filetoDelete, pythonScriptFiles);
     filetoDelete.forEach(file => {
+        const cmd = `rm ${file}`;
+        console.log('cmd: ', cmd)
+        callCmd(cmd);
+    })  
+    
+    pythonScriptFiles.forEach(file => {
         const cmd = `rm ${file}`;
         console.log('cmd: ', cmd)
         callCmd(cmd);
