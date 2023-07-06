@@ -125,7 +125,7 @@ function getAccessToken(url, requestOptions, files) {
             console.log(files[0])
             configurations.floorDataTable = bucket;
             bucket = bucket.toLowerCase()
-            configurations.bucketKey = bucket.contains(".ifc") ? bucket.replace('.ifc', '') : bucket;
+            configurations.bucketKey = bucket.includes(".ifc") ? bucket.replace('.ifc', '') : bucket;
             let requestOptions = {
                 method: 'POST',
                 headers: {
