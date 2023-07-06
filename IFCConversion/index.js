@@ -122,6 +122,7 @@ function getAccessToken(url, requestOptions, files) {
             // Set up create bucket function
             let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
             let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
+            console.log(files[0])
             configurations.floorDataTable = bucket;
             bucket = bucket.toLowerCase()
             configurations.bucketKey = bucket;
@@ -325,6 +326,8 @@ function ifcToJson(file, fileOutput) {
 }
 
 function uploadToS3() {
+
+    // Upload GLB and project config files to S3
     filetoDelete.forEach(file => {
         const body = fs.readFileSync(file);
         const params = {
@@ -346,7 +349,8 @@ function uploadToS3() {
     let pythonCmd = `python3 script.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
     console.log('PYTHON COMMAND: ', pythonCmd)
     // callCmd(pythonCmd);
-    
+
+    // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
     removeAllFiles();
 
 }
