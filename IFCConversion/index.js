@@ -348,13 +348,13 @@ function uploadToS3() {
     console.log('DO PYTHON SCRIPT HERE')
     let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
     console.log('PYTHON COMMAND: ', pythonCmd)
-    callCmd(pythonCmd);
+    callCmd(pythonCmd, removeAllFiles);
 
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
-    removeAllFiles();
+    // removeAllFiles();
 
 }
-function callCmd(cmdline) {
+function callCmd(cmdline, callback) {
     let cmd = spawn (cmdline, [], {shell:true});
     cmd.stdout.on("data", data => {
         console.log(`stdout: ${data}`);
@@ -369,6 +369,7 @@ function callCmd(cmdline) {
     });
     cmd.on("close", code => {
         console.log(`child process exited with code ${code}`);
+        callback;
     })
 }
 function removeAllFiles() {
