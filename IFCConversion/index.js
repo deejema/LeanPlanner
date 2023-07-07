@@ -346,7 +346,7 @@ function uploadToS3() {
     
     // PYTHON SCRIPT HERE THAT DEALS WITH XML AND JSON
     console.log('DO PYTHON SCRIPT HERE')
-    let pythonCmd = `python3 script.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
+    let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
     console.log('PYTHON COMMAND: ', pythonCmd)
     // callCmd(pythonCmd);
 
