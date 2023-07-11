@@ -98,7 +98,7 @@ function fromDir(startPath, filter, callback) {
         } else if (filter.test(filename)) {
             console.log('filename', filename)
             filelist.push(filename);
-            // filenames.push(filename); // IFC
+            filenames.push(filename); // IFC
             // callback(filename);
         }
     };
