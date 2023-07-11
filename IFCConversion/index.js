@@ -21,7 +21,7 @@ const s3 = new AWS.S3({
  * 7.) Replace variable placeholders with actual values
  * 8.) Move .env to correct folder
  */
-const filetoDelete = []; // GLB
+const filetoDelete = []; // GLB/IFC
 const pythonScriptFiles = []; // XML/JSON
 console.log(config.client_id, config.client_secret);
 if (!config.client_id || !config.client_secret) {
@@ -98,7 +98,7 @@ function fromDir(startPath, filter, callback) {
         } else if (filter.test(filename)) {
             console.log('filename', filename)
             filelist.push(filename);
-            filenames.push(filename); // IFC
+            filetoDelete.push(filename); // IFC
             // callback(filename);
         }
     };
