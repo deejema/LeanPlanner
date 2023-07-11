@@ -246,8 +246,8 @@ def main(xml_file, json_file):
 
     print("test")
     formatSingleTable(RDSReadyDict)
-    createTable(tableAttributes)
-    insertIntoRDS(RDSReadyDict)
+    # createTable(tableAttributes)
+    # insertIntoRDS(RDSReadyDict)
     singleTable(singleTableCategories, singleTableFormat)
 
     print("--- %s seconds ---" % (time.time() - start_time))
