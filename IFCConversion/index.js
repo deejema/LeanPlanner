@@ -329,18 +329,21 @@ async function uploadToS3() {
 
     // Upload GLB and project config files to S3
     filetoDelete.forEach(file => {
-        const body = fs.readFileSync(file);
-        const params = {
-            Bucket: config.awsBucket,
-            Key: file,
-            Body: body
-        }
-        s3.upload(params, (err, data) => {
-            if (err) {
-                console.log(err);
+        if (file.includes('.ifc.glb')) {
+
+            const body = fs.readFileSync(file);
+            const params = {
+                Bucket: config.awsBucket,
+                Key: file,
+                Body: body
             }
-            console.log(data);
-        })
+            s3.upload(params, (err, data) => {
+                if (err) {
+                    console.log(err);
+                }
+                console.log(data);
+            })
+        }
 
     })
     
@@ -348,13 +351,10 @@ async function uploadToS3() {
     console.log('DO PYTHON SCRIPT HERE')
     let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
     console.log('PYTHON COMMAND: ', pythonCmd)
-    callCmd(pythonCmd, true).then(() => {
-        removeAllFiles();
-
-    })
+    callCmd(pythonCmd, true);
 
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
-
+    // removeAllFiles();
 }
 function callCmd(cmdline, removeFiles = false) {
     return new Promise(resolve => {
@@ -373,9 +373,10 @@ function callCmd(cmdline, removeFiles = false) {
         });
         cmd.on("close", code => {
             console.log(`child process exited with code ${code}`);
-            // if (removeFiles) {
-            //     removeAllFiles();
-            // }
+            if (removeFiles) {
+                setTimeout(5000);
+                removeAllFiles();
+            }
             resolve(true);
         })
     });
