@@ -351,6 +351,9 @@ async function uploadToS3() {
     console.log('DO PYTHON SCRIPT HERE')
     let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
     console.log('PYTHON COMMAND: ', pythonCmd)
+    
+    await sleep(5000);
+    
     callCmd(pythonCmd, true);
 
     await sleep(5000);
