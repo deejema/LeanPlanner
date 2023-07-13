@@ -353,11 +353,12 @@ async function uploadToS3() {
     console.log('PYTHON COMMAND: ', pythonCmd)
     callCmd(pythonCmd, true);
 
+    await sleep(5000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
-    // removeAllFiles();
+    removeAllFiles();
 }
-function callCmd(cmdline, removeFiles = false) {
-    return new Promise(resolve => {
+async function callCmd(cmdline, removeFiles = false) {
+    // return new Promise(resolve => {
 
         let cmd = spawn (cmdline, [], {shell:true});
         cmd.stdout.on("data", data => {
@@ -373,13 +374,15 @@ function callCmd(cmdline, removeFiles = false) {
         });
         cmd.on("close", code => {
             console.log(`child process exited with code ${code}`);
-            if (removeFiles) {
-                setTimeout(5000);
-                removeAllFiles();
-            }
-            resolve(true);
+            // if (removeFiles) {
+            //     removeAllFiles();
+            // }
+            // resolve(true);
         })
-    });
+    // });
+}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs, URNS, ENV'); // MVP ONLY REMOVE GLB/IFC/JSON
