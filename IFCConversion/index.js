@@ -353,8 +353,8 @@ async function uploadToS3() {
     console.log('PYTHON COMMAND: ', pythonCmd)
     
     await sleep(5000);
-    
-    callCmd(pythonCmd, true);
+
+    // callCmd(pythonCmd, true);
 
     await sleep(5000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
