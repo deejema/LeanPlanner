@@ -325,7 +325,7 @@ function ifcToJson(file, fileOutput) {
 
 }
 
-function uploadToS3() {
+async function uploadToS3() {
 
     // Upload GLB and project config files to S3
     filetoDelete.forEach(file => {
@@ -348,31 +348,35 @@ function uploadToS3() {
     console.log('DO PYTHON SCRIPT HERE')
     let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
     console.log('PYTHON COMMAND: ', pythonCmd)
-    callCmd(pythonCmd, true);
+    await callCmd(pythonCmd, true);
 
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
-    // removeAllFiles();
+    removeAllFiles();
 
 }
 function callCmd(cmdline, removeFiles = false) {
-    let cmd = spawn (cmdline, [], {shell:true});
-    cmd.stdout.on("data", data => {
-        console.log(`stdout: ${data}`);
-    });
+    return new Promise(resolve => {
 
-    cmd.stderr.on("data", data => {
-        console.log(`stderr: ${data}`);
+        let cmd = spawn (cmdline, [], {shell:true});
+        cmd.stdout.on("data", data => {
+            console.log(`stdout: ${data}`);
+        });
+    
+        cmd.stderr.on("data", data => {
+            console.log(`stderr: ${data}`);
+        });
+    
+        cmd.on('error', (error) => {
+            console.log(`error: ${error.message}`);
+        });
+        cmd.on("close", code => {
+            console.log(`child process exited with code ${code}`);
+            // if (removeFiles) {
+            //     removeAllFiles();
+            // }
+            resolve(true);
+        })
     });
-
-    cmd.on('error', (error) => {
-        console.log(`error: ${error.message}`);
-    });
-    cmd.on("close", code => {
-        console.log(`child process exited with code ${code}`);
-        if (removeFiles) {
-            removeAllFiles();
-        }
-    })
 }
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs, URNS, ENV'); // MVP ONLY REMOVE GLB/IFC/JSON
