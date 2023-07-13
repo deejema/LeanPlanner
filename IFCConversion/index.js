@@ -348,10 +348,12 @@ async function uploadToS3() {
     console.log('DO PYTHON SCRIPT HERE')
     let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
     console.log('PYTHON COMMAND: ', pythonCmd)
-    await callCmd(pythonCmd, true);
+    callCmd(pythonCmd, true).then(() => {
+        removeAllFiles();
+
+    })
 
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
-    removeAllFiles();
 
 }
 function callCmd(cmdline, removeFiles = false) {
