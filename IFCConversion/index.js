@@ -358,7 +358,7 @@ async function uploadToS3() {
 
     await sleep(5000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
-    removeAllFiles();
+    // removeAllFiles();
 }
 async function callCmd(cmdline, removeFiles = false) {
     // return new Promise(resolve => {
