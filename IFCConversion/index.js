@@ -330,7 +330,7 @@ async function uploadToS3() {
     // Upload GLB and project config files to S3
     filetoDelete.forEach(file => {
         if (file.includes('.ifc.glb')) {
-
+            console.log('uploading: ', file)
             const body = fs.readFileSync(file);
             const params = {
                 Bucket: config.awsBucket,
