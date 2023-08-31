@@ -107,10 +107,12 @@ ls.on("close", async code => {
     let bucketStatus = await createBucket(createBucketUrl, bucketRequestOptions, files);
     console.log('bucket status: ', bucketStatus)
 
+    // Consolidate all urns for project
+    configurations.urns = [];
     // Upload each file to project bucket
-    files.forEach((file) => {
-        let url = `https://developer.api.autodesk.com/oss/v2/buckets/${configurations.bucketKey}/objects/${file}`;
-        let requestOptions = {
+    files.forEach(async (file) => {
+        let fileUploadurl = `https://developer.api.autodesk.com/oss/v2/buckets/${configurations.bucketKey}/objects/${file}`;
+        let fileUploadrequestOptions = {
             method:'PUT',
             headers: {
                 'Content-Type':'application/octet-stream',
@@ -118,9 +120,70 @@ ls.on("close", async code => {
             },
             body: fs.createReadStream(__dirname + '/' + file)
         }
-        console.log('file: ', url, requestOptions)
+        console.log('file: ', fileUploadurl, fileUploadrequestOptions)
+        let uploadedFile = await uploadFile(fileUploadurl, fileUploadrequestOptions)
+        
+        console.log('uploadFile', uploadedFile, uploadedFile.objectId);
+                
+
+        // Translate job
+        let encoded_urn = Buffer.from(uploadedFile.objectId).toString('base64');
+        let url = `https://developer.api.autodesk.com/modelderivative/v2/designdata/job`;
+        let requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${configurations.access_token}`
+            },
+            body: JSON.stringify({
+                input: { urn: encoded_urn },
+                output: { 
+                    destination: { 
+                        region: 'us' 
+                    },
+                    formats: [{
+                        type: 'svf',
+                        views: ["2d", "3d"]
+                    }]
+                }
+            })
+        }
+        let translation = await translateFile(url, requestOptions, file)
+        console.log('translation ', translation)
+        
+        let checkStatusUrl = `https://developer.api.autodesk.com/modelderivative/v2/designdata/${translation.urn}/manifest`;
+        let translationStatusOptions = {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${configurations.access_token}`
+            }
+        }
+        let progress = await checkStatusOfTranslation(checkStatusUrl, translationStatusOptions);
+        while(progress !== 'complete') {
+            progress = await checkStatusOfTranslation(checkStatusUrl, translationStatusOptions);
+            console.log('progress: ', progress);
+        }
+        configurations.urns.push(encoded_urn);
     })
-    // uploadFile(url, requestOptions, files[0]);
+    console.log('urns: ', configurations.urns);
+    // Create urns.js
+    // fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
+    //     if (err) throw err;
+    //     console.log('Copied template urns.js to source');
+
+    //     fs.readFile('urns.js', 'utf8', function(err, data) {
+    //         if (err) {
+    //             return console.log(err);
+    //         }
+    //         let resUrns = data.replace('<REPLACE_URN>', result.urn);
+    //         console.log('res', resUrns)
+    //         // filenames.push('urns.js'); // URNS
+    //         fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
+    //             if (err) { console.log(err)}
+    //         })
+    //     })
+    // })
+    // translateIFCToJson();
 });
 
 function fromDir(startPath, filter, callback) {
@@ -178,9 +241,7 @@ async function createBucket(url, requestOptions) {
         request(url, requestOptions, function(err, res) {
         if (err) reject('BUCKET ERROR - ', err);
         try {
-            let options = JSON.parse(res.body);
-            console.log(options);
-    
+            let options = JSON.parse(res.body);    
             resolve(options);
 
         } catch (e) {
@@ -191,96 +252,51 @@ async function createBucket(url, requestOptions) {
     })
 }
 
-function uploadFile(url, requestOptions, file) {
+async function uploadFile(url, requestOptions) {
     console.log('uploadFile')
-    request(url, requestOptions, function(err, res) {
-        if (err) console.log(err);
-        try{
-            let result = JSON.parse(res.body);
-            console.log('uploadFile', result, result.objectId);
+    return new Promise((resolve, reject) => {
+        request(url, requestOptions, function(err, res) {
+            if (err) reject(err);
+            try{
+                let result = JSON.parse(res.body);
+                resolve(result);
 
-            // Translate job
-            let encoded_urn = Buffer.from(result.objectId).toString('base64');
-            let url = `https://developer.api.autodesk.com/modelderivative/v2/designdata/job`;
-            let requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${configurations.access_token}`
-                },
-                body: JSON.stringify({
-                    input: { urn: encoded_urn },
-                    output: { 
-                        destination: { 
-                            region: 'us' 
-                        },
-                        formats: [{
-                            type: 'svf',
-                            views: ["2d", "3d"]
-                        }]
-                    }
-                })
+            } catch (e) {
+                reject('Err: ', e)
             }
-            translateFile(url, requestOptions, file)
-        } catch (e) {
-            console.log('Err: ', e)
-        }
-    });
+        });
+    })
 }
 
-function translateFile(url, requestOptions) {
+async function translateFile(url, requestOptions) {
     console.log('translateFile')
-    request(url, requestOptions, function (err, res) {
-        if (err) console.log(err);
-        try {
-            let result = JSON.parse(res.body);
-            console.log(result);
-
-            let url = `https://developer.api.autodesk.com/modelderivative/v2/designdata/${result.urn}/manifest`;
-            let requestOptions = {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${configurations.access_token}`
-                }
+    return new Promise((resolve, reject) => {
+        request(url, requestOptions, function (err, res) {
+            if (err) reject(err);
+            try {
+                let result = JSON.parse(res.body);
+                console.log(result);
+                resolve(result);
+            } catch (e) {
+                reject('translateFile: ', e)
             }
-            checkStatusOfTranslation(url, requestOptions) 
-        } catch (e) {
-            console.log('translateFile: ', e)
-        }
-    });
+        });
+    })
 }
 
 function checkStatusOfTranslation(url, requestOptions) {
-    request(url, requestOptions, function (err, res) {
-        if (err) console.log(err);
-        
-        try {
-            let result = JSON.parse(res.body);
-            console.log(result);
-            if (result.progress !== 'complete' ){
-                checkStatusOfTranslation(url, requestOptions);
-            } else {
-                fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
-                    if (err) throw err;
-                    console.log('Copied template urns.js to source');
-        
-                    fs.readFile('urns.js', 'utf8', function(err, data) {
-                        if (err) {
-                            return console.log(err);
-                        }
-                        let resUrns = data.replace('<REPLACE_URN>', result.urn);
-                        console.log('res', resUrns)
-                        // filenames.push('urns.js'); // URNS
-                        fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
-                            if (err) { console.log(err)}
-                        })
-                    })
-                })
-                translateIFCToJson();
+    return new Promise((resolve, reject) => {
+        request(url, requestOptions, function (err, res) {
+            if (err) reject(err);
+            
+            try {
+                let result = JSON.parse(res.body);
+                console.log(result);
+                resolve(result.progress);
+            } catch (e) {
+                reject('checkStatus: ', e)
             }
-        } catch (e) {
-            console.log('checkStatus: ', e)
-        }
+        })
     })
 }
 
