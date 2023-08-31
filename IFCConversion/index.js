@@ -167,19 +167,9 @@ async function createBucket(url, requestOptions) {
             console.log(options);
     
             resolve(options);
-            // Set up upload file
-            let url = `https://developer.api.autodesk.com/oss/v2/buckets/${configurations.bucketKey}/objects/${files[0]}`;
-            let requestOptions = {
-                method:'PUT',
-                headers: {
-                    'Content-Type':'application/octet-stream',
-                    'Authorization': `Bearer ${configurations.access_token}`
-                },
-                body: fs.createReadStream(__dirname + '/' + files[0])
-            }
-            // uploadFile(url, requestOptions, files[0]);
+
         } catch (e) {
-            throw new Error('GetAccessToken - ', e);
+            reject('BUCKET ERROR- ', e)
         }
     });
 
