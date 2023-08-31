@@ -112,45 +112,48 @@ function fromDir(startPath, filter, callback) {
 
 async function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
-    files.forEach(file => {
-        filetoDelete.push(file); // glb
-        pythonScriptFiles.push(file.replace('.glb', '.xml'))
-    })
-    request(url, requestOptions, function(err, res) {
-        if (err) console.log(err);
-        try {
-            let bodyjson = JSON.parse(res.body);
-            configurations.access_token = bodyjson.access_token;
-            const access_token = bodyjson.access_token;
-            console.log('Got Access Token', access_token)
-
-            // Set up create bucket function
-            let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
-            // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
-            // configurations.floorDataTable = bucket;
-            // bucket = bucket.toLowerCase()
-            // console.log('bucket name', bucket)
-            // configurations.bucketKey = bucket;
-            configurations.bucketKey = configurations.bucket;
-            let requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${access_token}`
-                },
-                body: JSON.stringify({
-                    bucketKey: configurations.bucket,
-                    access:'full',
-                    policyKey: 'persistent'
-                })
+    return new Promise((res) => {
+        files.forEach(file => {
+            filetoDelete.push(file); // glb
+            pythonScriptFiles.push(file.replace('.glb', '.xml'))
+        })
+        request(url, requestOptions, function(err, res) {
+            if (err) console.log(err);
+            try {
+                let bodyjson = JSON.parse(res.body);
+                configurations.access_token = bodyjson.access_token;
+                const access_token = bodyjson.access_token;
+                console.log('Got Access Token', access_token)
+    
+                // Set up create bucket function
+                let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
+                // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
+                // configurations.floorDataTable = bucket;
+                // bucket = bucket.toLowerCase()
+                // console.log('bucket name', bucket)
+                // configurations.bucketKey = bucket;
+                configurations.bucketKey = configurations.bucket;
+                let requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${access_token}`
+                    },
+                    body: JSON.stringify({
+                        bucketKey: configurations.bucket,
+                        access:'full',
+                        policyKey: 'persistent'
+                    })
+                }
+                console.log(requestOptions);
+                // createBucket(url, requestOptions, files);
+                resolve(access_token);
+            } catch (e) {
+                console.log('GetAccessToken - ', e);
             }
-            console.log(requestOptions);
-            // createBucket(url, requestOptions, files);
-            return access_token;
-        } catch (e) {
-            console.log('GetAccessToken - ', e);
-        }
-    });
+        });
+
+    })
 }
 
 function createBucket(url, requestOptions, files) {    
