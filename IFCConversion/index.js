@@ -42,20 +42,20 @@ if (process.argv.length && process.argv.length == 4) {
 // console.log(`Running ICC to GLB Conversion BAT file`)
 // const ls = spawn("ICC_to_GLB", [], {shell:true});
 console.log('Running IFC TO GLB SCRIPT');
-const ls = spawn("./scriptToGlb", [], {shell:true});
-ls.stdout.on("data", data => {
-    console.log(`stdout: ${data}`);
-});
+// const ls = spawn("./scriptToGlb", [], {shell:true});
+// ls.stdout.on("data", data => {
+//     console.log(`stdout: ${data}`);
+// });
 
-ls.stderr.on("data", data => {
-    console.log(`stderr: ${data}`);
-});
+// ls.stderr.on("data", data => {
+//     console.log(`stderr: ${data}`);
+// });
 
-ls.on('error', (error) => {
-    console.log(`error: ${error.message}`);
-});
+// ls.on('error', (error) => {
+//     console.log(`error: ${error.message}`);
+// });
 
-ls.on("close", async code => {
+// ls.on("close", async code => {
     console.log(`child process exited with code ${code}`);
 
     console.log('upload GLB here')
@@ -83,7 +83,7 @@ ls.on("close", async code => {
     }
     let access = await getAccessToken(url, requestOptions, files);
     console.log('access ', access)
-});
+// });
 
 function fromDir(startPath, filter, callback) {
     let filelist = [];
