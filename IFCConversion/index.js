@@ -55,7 +55,7 @@ ls.on('error', (error) => {
     console.log(`error: ${error.message}`);
 });
 
-ls.on("close", code => {
+ls.on("close", async code => {
     console.log(`child process exited with code ${code}`);
 
     console.log('upload GLB here')
@@ -81,8 +81,8 @@ ls.on("close", code => {
             scope: 'code:all data:write data:read bucket:create bucket:delete'
         })
     }
-    getAccessToken(url, requestOptions, files);
-
+    let access = await getAccessToken(url, requestOptions, files);
+    console.log('access ', access)
 });
 
 function fromDir(startPath, filter, callback) {
@@ -110,46 +110,47 @@ function fromDir(startPath, filter, callback) {
     return filelist
 };
 
-function getAccessToken(url, requestOptions, files) {
+async function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
     files.forEach(file => {
         filetoDelete.push(file); // glb
         pythonScriptFiles.push(file.replace('.glb', '.xml'))
     })
-    // request(url, requestOptions, function(err, res) {
-    //     if (err) console.log(err);
-    //     try {
-    //         let bodyjson = JSON.parse(res.body);
-    //         configurations.access_token = bodyjson.access_token;
-    //         const access_token = bodyjson.access_token;
-    //         console.log('Got Access Token', access_token)
+    request(url, requestOptions, function(err, res) {
+        if (err) console.log(err);
+        try {
+            let bodyjson = JSON.parse(res.body);
+            configurations.access_token = bodyjson.access_token;
+            const access_token = bodyjson.access_token;
+            console.log('Got Access Token', access_token)
 
-    //         // Set up create bucket function
-    //         let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
-    //         // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
-    //         // configurations.floorDataTable = bucket;
-    //         // bucket = bucket.toLowerCase()
-    //         // console.log('bucket name', bucket)
-    //         // configurations.bucketKey = bucket;
-    //         configurations.bucketKey = configurations.bucket;
-    //         let requestOptions = {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${access_token}`
-    //             },
-    //             body: JSON.stringify({
-    //                 bucketKey: configurations.bucket,
-    //                 access:'full',
-    //                 policyKey: 'persistent'
-    //             })
-    //         }
-    //         console.log(requestOptions);
-    //         createBucket(url, requestOptions, files);
-    //     } catch (e) {
-    //         console.log('GetAccessToken - ', e);
-    //     }
-    // });
+            // Set up create bucket function
+            let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
+            // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
+            // configurations.floorDataTable = bucket;
+            // bucket = bucket.toLowerCase()
+            // console.log('bucket name', bucket)
+            // configurations.bucketKey = bucket;
+            configurations.bucketKey = configurations.bucket;
+            let requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access_token}`
+                },
+                body: JSON.stringify({
+                    bucketKey: configurations.bucket,
+                    access:'full',
+                    policyKey: 'persistent'
+                })
+            }
+            console.log(requestOptions);
+            // createBucket(url, requestOptions, files);
+            return access_token;
+        } catch (e) {
+            console.log('GetAccessToken - ', e);
+        }
+    });
 }
 
 function createBucket(url, requestOptions, files) {    
@@ -171,7 +172,11 @@ function createBucket(url, requestOptions, files) {
             },
             body: fs.createReadStream(__dirname + '/' + files[0])
         }
-        uploadFile(url, requestOptions, files[0]);
+        files.forEach(file => {
+            uploadFile(url, requestOptions, file);
+
+        })
+        // uploadFile(url, requestOptions, files[0]);
     } catch (e) {
         throw new Error('GetAccessToken - ', e);
     }
