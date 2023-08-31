@@ -164,8 +164,8 @@ ls.on("close", async code => {
             console.log('progress: ', progress);
         }
         configurations.urns.push(encoded_urn);
+        console.log('urns: ', configurations.urns);
     })
-    console.log('urns: ', configurations.urns);
     // Create urns.js
     // fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
     //     if (err) throw err;
