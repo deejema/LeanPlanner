@@ -112,7 +112,7 @@ function fromDir(startPath, filter, callback) {
 
 async function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
-    return new Promise((res) => {
+    return new Promise((resolve) => {
         files.forEach(file => {
             filetoDelete.push(file); // glb
             pythonScriptFiles.push(file.replace('.glb', '.xml'))
