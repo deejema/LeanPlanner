@@ -84,7 +84,7 @@ ls.on("close", async code => {
     let access = await getAccessToken(tokenUrl, tokenRequestOptions, files);
     console.log('access token: ', access)
 
-    // Set up create bucket function
+    // Set up create bucket
     let createBucketUrl = 'https://developer.api.autodesk.com/oss/v2/buckets';
     // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
     // configurations.floorDataTable = bucket;
@@ -106,6 +106,21 @@ ls.on("close", async code => {
     }
     let bucketStatus = await createBucket(createBucketUrl, bucketRequestOptions, files);
     console.log('bucket status: ', bucketStatus)
+
+    // Upload each file to project bucket
+    files.forEach((file) => {
+        let url = `https://developer.api.autodesk.com/oss/v2/buckets/${configurations.bucketKey}/objects/${file}`;
+        let requestOptions = {
+            method:'PUT',
+            headers: {
+                'Content-Type':'application/octet-stream',
+                'Authorization': `Bearer ${configurations.access_token}`
+            },
+            body: fs.createReadStream(__dirname + '/' + file)
+        }
+        console.log('file: ', url, requestOptions)
+    })
+    // uploadFile(url, requestOptions, files[0]);
 });
 
 function fromDir(startPath, filter, callback) {
