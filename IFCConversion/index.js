@@ -67,8 +67,8 @@ ls.on("close", async code => {
     console.log(files);
 
     // Get Access Token from authentication    
-    let url = 'https://developer.api.autodesk.com/authentication/v1/authenticate';
-    let requestOptions = {
+    let tokenUrl = 'https://developer.api.autodesk.com/authentication/v1/authenticate';
+    let tokenRequestOptions = {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -81,8 +81,31 @@ ls.on("close", async code => {
             scope: 'code:all data:write data:read bucket:create bucket:delete'
         })
     }
-    let access = await getAccessToken(url, requestOptions, files);
-    console.log('access ', access)
+    let access = await getAccessToken(tokenUrl, tokenRequestOptions, files);
+    console.log('access token: ', access)
+
+    // Set up create bucket function
+    let createBucketUrl = 'https://developer.api.autodesk.com/oss/v2/buckets';
+    // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
+    // configurations.floorDataTable = bucket;
+    // bucket = bucket.toLowerCase()
+    // console.log('bucket name', bucket)
+    // configurations.bucketKey = bucket;
+    configurations.bucketKey = configurations.bucket;
+    let bucketRequestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${access}`
+        },
+        body: JSON.stringify({
+            bucketKey: configurations.bucket,
+            access:'full',
+            policyKey: 'persistent'
+        })
+    }
+    let bucketStatus = await createBucket(createBucketUrl, bucketRequestOptions, files);
+    console.log('bucket status: ', bucketStatus)
 });
 
 function fromDir(startPath, filter, callback) {
@@ -112,78 +135,55 @@ function fromDir(startPath, filter, callback) {
 
 async function getAccessToken(url, requestOptions, files) {
     console.log('glb files', files);
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         files.forEach(file => {
             filetoDelete.push(file); // glb
             pythonScriptFiles.push(file.replace('.glb', '.xml'))
         })
         request(url, requestOptions, function(err, res) {
-            if (err) console.log(err);
+            if (err) reject('SOMETHING HAPPENED - ', err);
             try {
                 let bodyjson = JSON.parse(res.body);
                 configurations.access_token = bodyjson.access_token;
                 const access_token = bodyjson.access_token;
-                console.log('Got Access Token', access_token)
-    
-                // Set up create bucket function
-                let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
-                // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
-                // configurations.floorDataTable = bucket;
-                // bucket = bucket.toLowerCase()
-                // console.log('bucket name', bucket)
-                // configurations.bucketKey = bucket;
-                configurations.bucketKey = configurations.bucket;
-                let requestOptions = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${access_token}`
-                    },
-                    body: JSON.stringify({
-                        bucketKey: configurations.bucket,
-                        access:'full',
-                        policyKey: 'persistent'
-                    })
-                }
-                console.log(requestOptions);
-                // createBucket(url, requestOptions, files);
+
                 resolve(access_token);
             } catch (e) {
                 console.log('GetAccessToken - ', e);
+                reject('SOMETHING HAPPENED IN ACCESS TOKEN')
             }
         });
 
     })
 }
 
-function createBucket(url, requestOptions, files) {    
+async function createBucket(url, requestOptions) {    
     console.log('createBucket');
-    request(url, requestOptions, function(err, res) {
-    if (err) console.log(err);
-    try {
-        let options = JSON.parse(res.body);
-        console.log(options);
-
-
-        // Set up upload file
-        let url = `https://developer.api.autodesk.com/oss/v2/buckets/${configurations.bucketKey}/objects/${files[0]}`;
-        let requestOptions = {
-            method:'PUT',
-            headers: {
-                'Content-Type':'application/octet-stream',
-                'Authorization': `Bearer ${configurations.access_token}`
-            },
-            body: fs.createReadStream(__dirname + '/' + files[0])
+    return new Promise((resolve, reject) => {
+        request(url, requestOptions, function(err, res) {
+        if (err) reject('BUCKET ERROR - ', err);
+        try {
+            let options = JSON.parse(res.body);
+            console.log(options);
+    
+            resolve(options);
+            // Set up upload file
+            let url = `https://developer.api.autodesk.com/oss/v2/buckets/${configurations.bucketKey}/objects/${files[0]}`;
+            let requestOptions = {
+                method:'PUT',
+                headers: {
+                    'Content-Type':'application/octet-stream',
+                    'Authorization': `Bearer ${configurations.access_token}`
+                },
+                body: fs.createReadStream(__dirname + '/' + files[0])
+            }
+            // uploadFile(url, requestOptions, files[0]);
+        } catch (e) {
+            throw new Error('GetAccessToken - ', e);
         }
-        files.forEach(file => {
-            uploadFile(url, requestOptions, file);
+    });
 
-        })
-        // uploadFile(url, requestOptions, files[0]);
-    } catch (e) {
-        throw new Error('GetAccessToken - ', e);
-    }
-});
+    })
 }
 
 function uploadFile(url, requestOptions, file) {
