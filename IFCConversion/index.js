@@ -165,29 +165,28 @@ ls.on("close", async code => {
         }
         configurations.urns.push(encoded_urn);
         console.log('urns: ', configurations.urns);
-
+    });
+    
         
-        // Create urns.js
-        fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
-            if (err) throw err;
-            console.log('Copied template urns.js to source');
+    // Create urns.js
+    fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
+        if (err) throw err;
+        console.log('Copied template urns.js to source');
 
-            fs.readFile('urns.js', 'utf8', function(err, data) {
-                if (err) {
-                    return console.log(err);
-                }
-                let urnString = configurations.urns.join(',');
-                let resUrns = data.replace('<REPLACE_URN>', urnString);
-                console.log('res', resUrns)
-                // filenames.push('urns.js'); // URNS
-                fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
-                    if (err) { console.log(err)}
-                })
+        fs.readFile('urns.js', 'utf8', function(err, data) {
+            if (err) {
+                return console.log(err);
+            }
+            let urnString = configurations.urns.join(',');
+            let resUrns = data.replace('<REPLACE_URN>', urnString);
+            console.log('res', resUrns)
+            // filenames.push('urns.js'); // URNS
+            fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
+                if (err) { console.log(err)}
             })
         })
-        // translateIFCToJson();
-
     })
+    // translateIFCToJson();
 });
 
 function fromDir(startPath, filter, callback) {
