@@ -8,6 +8,7 @@ const config = require('./config').config;
 const fileUpload = require('express-fileupload');
 const {exec} = require('child_process');
 const AWS = require('aws-sdk');
+const fs = require('fs');
 
 exec("dir", (error, stdout, stderr) => {
     if (error) {
@@ -107,12 +108,55 @@ app.post('/upload', async(req, res) => {
     if (!req.files) {
         return res.status(400).send("No files were uploaded.");
     }
-    const file = req.files.myFile;
-    const path = __dirname + "/files/" + file.name;
+    const files = req.files.myFile;
+    const projectName = req.body.project;
+    const path = __dirname + "/files/" + projectName;
     const username = req.body.username;
+    console.log('files', files);
+    console.log('path', path);
+
+    let resData = resDataForUser(username); // Set up res data
+    let port = projects.saveToCSV(projectName); // Create project first in CSV
+    if (!port) { // Check to make sure port exists, if not, exit out
+        res.send("NO MORE AVAILABLE PROJECT SPACE; CONTACT ADMIN");
+    } else {
+        let csvLine = `${projectName}, ${port}`; // Set up bucket info for IFC conversion
     
-    projects.saveToCSV(file.name, 1234);
+        // Upload files
+        if (files.length && files.length > 0) {
+            console.log('# of files', files.length);
+            files.forEach(async file => {
+                csvLine += ', ' + file.name;
+                await uploadToS3(file);
+            })
+        } else {
+            csvLine += ', ' + files.name;
+            await uploadToS3(files);
+        }
+        const bucketInfo = {
+            name: 'bucketInfo.txt',
+            data: csvLine
+        }
+        
+        await uploadToS3(bucketInfo)
+    }
+
+
     
+
+
+    // // Used for moving locally, only does single file so it'll break with more than one
+    // file.mv(path, (err) => {
+    //     if (err) {
+    //         return res.status(500).send(err);
+    //     }
+        res.send(resData); // Uncomment this at all times, this sends the project list with updated stuffs
+    //     // return res.send({ status: "success", path: path });
+    // });
+    // console.log('file: ', file);
+})
+
+async function uploadToS3(file) {
     const params = {
         Bucket: config.awsBucket,
         Key: file.name,
@@ -126,17 +170,7 @@ app.post('/upload', async(req, res) => {
         }
         console.log(data.Location);
     })
-    let resData = resDataForUser(username);
-
-    file.mv(path, (err) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
-        res.send(resData);
-        // return res.send({ status: "success", path: path });
-    });
-    console.log('file: ', file);
-})
+}
 server.listen(config.port, function() {
     console.log('Server is listening on port: ', config.port)
 })
@@ -181,8 +215,8 @@ function resDataForUser(userName) {
 
     <form action="/upload" method="POST" enctype="multipart/form-data">
         <fieldset>
-
-        <input type="file" name="myFile" />
+        <label for="project">Project Name: </label><input type="text" id="project" name="project" required />
+        <input type="file" name="myFile" multiple/>
         <input type="text" id="username" name="username" placeholder="username" style="display:none" value="${userName}" required>
         <button type="submit">Submit</button>
 

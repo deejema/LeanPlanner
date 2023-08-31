@@ -30,8 +30,13 @@ if (!config.client_id || !config.client_secret) {
 }
 let configurations = {}; // Used to keep track of additional config
 
-if (process.argv.length && process.argv.length == 3) {
-    configurations.port = process.argv[2];
+// lambda script
+// node index.js 3001 test3
+
+if (process.argv.length && process.argv.length == 4) {
+    configurations.port = process.argv[2]; // port
+    configurations.floorDataTable = process.argv[3] // Project Name to look up floor data in RDS
+    configurations.bucket = process.argv[3].toLowerCase(); // bucket for forge
 }
 // Run ICC to GLB Converter
 // console.log(`Running ICC to GLB Conversion BAT file`)
@@ -111,39 +116,40 @@ function getAccessToken(url, requestOptions, files) {
         filetoDelete.push(file); // glb
         pythonScriptFiles.push(file.replace('.glb', '.xml'))
     })
-    request(url, requestOptions, function(err, res) {
-        if (err) console.log(err);
-        try {
-            let bodyjson = JSON.parse(res.body);
-            configurations.access_token = bodyjson.access_token;
-            const access_token = bodyjson.access_token;
-            console.log('Got Access Token', access_token)
+    // request(url, requestOptions, function(err, res) {
+    //     if (err) console.log(err);
+    //     try {
+    //         let bodyjson = JSON.parse(res.body);
+    //         configurations.access_token = bodyjson.access_token;
+    //         const access_token = bodyjson.access_token;
+    //         console.log('Got Access Token', access_token)
 
-            // Set up create bucket function
-            let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
-            let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
-            configurations.floorDataTable = bucket;
-            bucket = bucket.toLowerCase()
-            console.log('bucket name', bucket)
-            configurations.bucketKey = bucket;
-            let requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${access_token}`
-                },
-                body: JSON.stringify({
-                    bucketKey: bucket,
-                    access:'full',
-                    policyKey: 'persistent'
-                })
-            }
-            console.log(requestOptions);
-            createBucket(url, requestOptions, files);
-        } catch (e) {
-            console.log('GetAccessToken - ', e);
-        }
-    });
+    //         // Set up create bucket function
+    //         let url = 'https://developer.api.autodesk.com/oss/v2/buckets';
+    //         // let bucket = files[0].replace(/\s/g, '').replace('.glb', '');
+    //         // configurations.floorDataTable = bucket;
+    //         // bucket = bucket.toLowerCase()
+    //         // console.log('bucket name', bucket)
+    //         // configurations.bucketKey = bucket;
+    //         configurations.bucketKey = configurations.bucket;
+    //         let requestOptions = {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': `Bearer ${access_token}`
+    //             },
+    //             body: JSON.stringify({
+    //                 bucketKey: configurations.bucket,
+    //                 access:'full',
+    //                 policyKey: 'persistent'
+    //             })
+    //         }
+    //         console.log(requestOptions);
+    //         createBucket(url, requestOptions, files);
+    //     } catch (e) {
+    //         console.log('GetAccessToken - ', e);
+    //     }
+    // });
 }
 
 function createBucket(url, requestOptions, files) {    
