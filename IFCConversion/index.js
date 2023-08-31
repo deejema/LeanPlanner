@@ -161,7 +161,7 @@ ls.on("close", async code => {
         let progress = await checkStatusOfTranslation(checkStatusUrl, translationStatusOptions);
         while(progress !== 'complete') {
             progress = await checkStatusOfTranslation(checkStatusUrl, translationStatusOptions);
-            console.log('progress: ', progress);
+            // console.log('progress: ', progress);
         }
         configurations.urns.push(encoded_urn);
         console.log('urns: ', configurations.urns);
