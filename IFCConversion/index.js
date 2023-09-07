@@ -120,10 +120,10 @@ ls.on("close", async code => {
             },
             body: fs.createReadStream(__dirname + '/' + file)
         }
-        console.log('file: ', fileUploadurl, fileUploadrequestOptions)
+        // console.log('file: ', fileUploadurl, fileUploadrequestOptions)
         let uploadedFile = await uploadFile(fileUploadurl, fileUploadrequestOptions)
         
-        console.log('uploadFile', uploadedFile, uploadedFile.objectId);
+        console.log('uploadFile 126', uploadedFile, uploadedFile.objectId);
                 
 
         // Translate job
