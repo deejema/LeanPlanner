@@ -165,23 +165,25 @@ ls.on("close", async code => {
         }
         configurations.urns.push(encoded_urn);
         console.log('urns: ', configurations.urns);
-    }).then(()=> {
-        // Create urns.js
-        fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
-            if (err) throw err;
-            console.log('Copied template urns.js to source');
+    })
+    console.log('169 configurations', configurations);
 
-            fs.readFile('urns.js', 'utf8', function(err, data) {
-                if (err) {
-                    return console.log(err);
-                }
-                let urnString = configurations.urns.join(',');
-                let resUrns = data.replace('<REPLACE_URN>', urnString);
-                console.log('res', resUrns)
-                // filenames.push('urns.js'); // URNS
-                fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
-                    if (err) { console.log(err)}
-                })
+    // FIGURE OUT THIS PART TODO, SYNCING ISSUE  CAUSE OF ASYNC
+    // Create urns.js
+    fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
+        if (err) throw err;
+        console.log('Copied template urns.js to source');
+
+        fs.readFile('urns.js', 'utf8', function(err, data) {
+            if (err) {
+                return console.log(err);
+            }
+            let urnString = configurations.urns.join(',');
+            let resUrns = data.replace('<REPLACE_URN>', urnString);
+            console.log('res', resUrns)
+            // filenames.push('urns.js'); // URNS
+            fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
+                if (err) { console.log(err)}
             })
         })
     })
