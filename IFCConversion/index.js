@@ -191,12 +191,13 @@ ls.on("close", async code => {
                         if (err) { console.log(err)}
                     })
                 })
+                // Translate to json files
+                // translateIFCToJson();
             })         
 
         }
     });        
     
-    // translateIFCToJson();
 });
 
 function fromDir(startPath, filter, callback) {
