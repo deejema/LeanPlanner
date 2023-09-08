@@ -192,7 +192,7 @@ ls.on("close", async code => {
                     })
                 })
                 // Translate to json files
-                // translateIFCToJson();
+                translateIFCToJson();
             })         
 
         }
