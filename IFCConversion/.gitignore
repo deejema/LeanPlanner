@@ -3,3 +3,6 @@ node_modules
 *.log
 IfcConvert
 IfcConvert.exe
+urns.js
+*.glb
+*.xml
