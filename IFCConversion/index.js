@@ -22,7 +22,8 @@ const s3 = new AWS.S3({
  * 8.) Move .env to correct folder
  */
 const filetoDelete = []; // GLB/IFC
-const pythonScriptFiles = []; // XML/JSON
+const pythonScriptFilesXml = []; // XML
+const pythonScriptFilesJson = []; // JSON
 console.log(config.client_id, config.client_secret);
 if (!config.client_id || !config.client_secret) {
     console.log('No client id or secret detected');
@@ -230,7 +231,7 @@ async function getAccessToken(url, requestOptions, files) {
     return new Promise((resolve, reject) => {
         files.forEach(file => {
             filetoDelete.push(file); // glb
-            pythonScriptFiles.push(file.replace('.glb', '.xml'))
+            pythonScriptFilesXml.push(file.replace('.glb', '.xml'))
         })
         request(url, requestOptions, function(err, res) {
             if (err) reject('SOMETHING HAPPENED - ', err);
@@ -320,8 +321,8 @@ function translateIFCToJson() {
     });
     ifCfiles.forEach(file => {
         console.log('Replace file to json: ', file.replace('.ifc', '.json'));
-        pythonScriptFiles.push(file.replace('.ifc', '.json')); // JSON
-        console.log('filenames from json', filetoDelete, pythonScriptFiles)
+        pythonScriptFilesJson.push(file.replace('.ifc', '.json')); // JSON
+        console.log('filenames from json', filetoDelete, pythonScriptFilesJson)
         ifcToJson(file, file.replace('.ifc', '.json'))
     })
 }
@@ -398,7 +399,8 @@ async function uploadToS3() {
     
     // PYTHON SCRIPT HERE THAT DEALS WITH XML AND JSON
     console.log('DO PYTHON SCRIPT HERE')
-    let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFiles[0]} ${pythonScriptFiles[1]}` // 0 = xml, 1 = json
+
+    let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFilesXml[0]} ${pythonScriptFilesJson[0]}`
     console.log('PYTHON COMMAND: ', pythonCmd)
     
     await sleep(5000);
