@@ -109,7 +109,10 @@ ls.on("close", async code => {
 
     // Consolidate all urns for project
     configurations.urns = [];
+
     // Upload each file to project bucket
+    let filesProcessed = 0; // process each file
+
     files.forEach(async (file) => {
         let fileUploadurl = `https://developer.api.autodesk.com/oss/v2/buckets/${configurations.bucketKey}/objects/${file}`;
         let fileUploadrequestOptions = {
@@ -124,7 +127,7 @@ ls.on("close", async code => {
         let uploadedFile = await uploadFile(fileUploadurl, fileUploadrequestOptions)
         
         console.log('uploadFile 126', uploadedFile, uploadedFile.objectId);
-                
+          
 
         // Translate job
         let encoded_urn = Buffer.from(uploadedFile.objectId).toString('base64');
@@ -165,30 +168,33 @@ ls.on("close", async code => {
         }
         configurations.urns.push(encoded_urn);
         console.log('urns: ', configurations.urns);
-    })
-    console.log('169 configurations', configurations);
 
-    // FIGURE OUT THIS PART TODO, SYNCING ISSUE  CAUSE OF ASYNC
-    // Create urns.js
-    // fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
-    //     if (err) throw err;
-    //     console.log('Copied template urns.js to source');
+        filesProcessed++;
+        console.log('files processed: ', filesProcessed, ' ', files.length)
+        if(filesProcessed === files.length) {
+            console.log('174 urns', configurations);
 
-    //     fs.readFile('urns.js', 'utf8', function(err, data) {
-    //         if (err) {
-    //             return console.log(err);
-    //         }
-    //         let urnString = configurations.urns.join(',');
-    //         let resUrns = data.replace('<REPLACE_URN>', urnString);
-    //         console.log('res', resUrns)
-    //         // filenames.push('urns.js'); // URNS
-    //         fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
-    //             if (err) { console.log(err)}
-    //         })
-    //     })
-    // })
-    
-        
+            // Create urns.js
+            fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
+                if (err) throw err;
+                console.log('Copied template urns.js to source');
+
+                fs.readFile('urns.js', 'utf8', function(err, data) {
+                    if (err) {
+                        return console.log(err);
+                    }
+                    let urnString = configurations.urns.join(',');
+                    let resUrns = data.replace('<REPLACE_URN>', urnString);
+                    console.log('res', resUrns)
+                    // filenames.push('urns.js'); // URNS
+                    fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
+                        if (err) { console.log(err)}
+                    })
+                })
+            })         
+
+        }
+    });        
     
     // translateIFCToJson();
 });
