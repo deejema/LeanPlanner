@@ -223,7 +223,7 @@ ls.on("close", async code => {
             let ifCfiles = fromDir('./', /\.ifc$/, function(filename) {
                 console.log('-- found: ', filename);
             });
-            // TODO: FIX MULTIPLE IFC FILES
+            // TODO: FIX MULTIPLE IFC FILES - THIS ONLY WORKS FOR ONE IFC 
             if (ifCfiles.length === 1) {
                 console.log('228 - 1 IFC file found');
                 ifCfiles.forEach(file => {
@@ -233,7 +233,7 @@ ls.on("close", async code => {
                     // ifcToJson(file, file.replace('.ifc', '.json'))
                 })
             }
-
+            uploadToS3();
         }
     });        
     
@@ -449,7 +449,7 @@ async function uploadToS3() {
 
     await sleep(5000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
-    // removeAllFiles();
+    removeAllFiles();
 }
 async function callCmd(cmdline, removeFiles = false) {
     // return new Promise(resolve => {
