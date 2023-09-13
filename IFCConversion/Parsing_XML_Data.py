@@ -142,11 +142,11 @@ def formatSingleTable(RDSReady):
                     if attribute not in singleTableCategories:
                         singleTableCategories[attribute] = "text"
 
-def singleTable(categories, data):
+def singleTable(categories, data, projName):
     db = pymysql.connect(host='ifc-test-info.csx7ghhxsuej.us-east-1.rds.amazonaws.com',
                         user='admin', password='password', database="Test", port=3306)
     cursor = db.cursor()
-    sql = 'CREATE TABLE IF NOT EXISTS `' + "Input" + "` ( "
+    sql = 'CREATE TABLE IF NOT EXISTS `' + projName + "` ( "
     for category in categories:
         sqlInput = "`" + category + "` " + categories[category] + ', '
         sql += sqlInput
@@ -200,7 +200,7 @@ with open('ICC-MEP-1F.xml', encoding="utf8") as xml_file:
     print(decomposition)
 """
 
-def main(xml_file, json_file):
+def main(xml_file, json_file, projName):
 
     with open(json_file) as json_file: # 'ICC-ARC-STR-17F-1702.json'
         data = json.load(json_file)
@@ -248,7 +248,7 @@ def main(xml_file, json_file):
     formatSingleTable(RDSReadyDict)
     # createTable(tableAttributes)
     # insertIntoRDS(RDSReadyDict)
-    singleTable(singleTableCategories, singleTableFormat)
+    singleTable(singleTableCategories, singleTableFormat, projName)
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

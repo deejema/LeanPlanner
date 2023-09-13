@@ -270,6 +270,7 @@ async function getAccessToken(url, requestOptions, files) {
         files.forEach(file => {
             filetoDelete.push(file); // glb
             pythonScriptFilesXml.push(file.replace('.glb', '.xml'))
+            pythonScriptFilesJson.push(file.replace('.glb', '.json'))
         })
         request(url, requestOptions, function(err, res) {
             if (err) reject('SOMETHING HAPPENED - ', err);
@@ -353,18 +354,18 @@ function checkStatusOfTranslation(url, requestOptions) {
     })
 }
 
-function translateIFCToJson() {
-    let ifCfiles = fromDir('./', /\.ifc$/, function(filename) {
-        console.log('-- found: ', filename);
-    });
-    // TODO: FIX MULTIPLE IFC FILES
-    ifCfiles.forEach(file => {
-        console.log('Replace file to json: ', file.replace('.ifc', '.json'));
-        pythonScriptFilesJson.push(file.replace('.ifc', '.json')); // JSON
-        console.log('filenames from json', filetoDelete, pythonScriptFilesJson)
-        ifcToJson(file, file.replace('.ifc', '.json'))
-    })
-}
+// function translateIFCToJson() {
+//     let ifCfiles = fromDir('./', /\.ifc$/, function(filename) {
+//         console.log('-- found: ', filename);
+//     });
+//     // TODO: FIX MULTIPLE IFC FILES
+//     ifCfiles.forEach(file => {
+//         console.log('Replace file to json: ', file.replace('.ifc', '.json'));
+//         pythonScriptFilesJson.push(file.replace('.ifc', '.json')); // JSON
+//         console.log('filenames from json', filetoDelete, pythonScriptFilesJson)
+//         ifcToJson(file, file.replace('.ifc', '.json'))
+//     })
+// }
 
 function ifcToJson(file, fileOutput) {
     console.log(`Translating ${file} to ${fileOutput}`)
@@ -417,29 +418,29 @@ function ifcToJson(file, fileOutput) {
 async function uploadToS3() {
 
     // Upload GLB and project config files to S3
-    // filetoDelete.forEach(file => {
-    //     if (file.includes('.ifc.glb')) {
-    //         console.log('uploading: ', file)
-    //         const body = fs.readFileSync(file);
-    //         const params = {
-    //             Bucket: config.awsBucket,
-    //             Key: file,
-    //             Body: body
-    //         }
-    //         s3.upload(params, (err, data) => {
-    //             if (err) {
-    //                 console.log(err);
-    //             }
-    //             console.log(data);
-    //         })
-    //     }
+    filetoDelete.forEach(file => {
+        if (file.includes('.ifc.glb')) {
+            console.log('uploading: ', file)
+            const body = fs.readFileSync(file);
+            const params = {
+                Bucket: config.awsBucket,
+                Key: file,
+                Body: body
+            }
+            s3.upload(params, (err, data) => {
+                if (err) {
+                    console.log(err);
+                }
+                console.log(data);
+            })
+        }
 
-    // })
+    })
     
     // PYTHON SCRIPT HERE THAT DEALS WITH XML AND JSON
     console.log('DO PYTHON SCRIPT HERE')
 
-    let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFilesXml[0]} ${pythonScriptFilesJson[0]}`
+    let pythonCmd = `python3 Parsing_XML_Data.py ${pythonScriptFilesXml[0]} ${pythonScriptFilesJson[0]} ${configurations.bucket}`
     console.log('PYTHON COMMAND: ', pythonCmd)
     
     await sleep(5000);
