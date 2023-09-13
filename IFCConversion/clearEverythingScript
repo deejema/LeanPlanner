@@ -1,0 +1,5 @@
+sudo rm *.glb
+sudo rm *.xml
+sudo rm *.ifc.json
+sudo rm urns.js
+sudo rm .env

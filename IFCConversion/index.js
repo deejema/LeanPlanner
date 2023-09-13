@@ -481,17 +481,23 @@ function sleep(ms) {
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs, URNS, ENV'); // MVP ONLY REMOVE GLB/IFC/JSON
     callCmd('./scriptMoveConfigFiles'); // FOR MVP TO MOVE URNS AND ENV FILE
-    console.log('files to upload', filetoDelete, pythonScriptFiles);
+    callCmd('./clearEverythingScript') // Just delete all any traces of XML/JSON/GLB/URNS.JS/.ENV if they exist
+    console.log('files to upload', filetoDelete, pythonScriptFilesXml, pythonScriptFilesJson);
     filetoDelete.forEach(file => {
         const cmd = `rm ${file}`;
         console.log('cmd: ', cmd)
         callCmd(cmd);
     })  
     
-    pythonScriptFiles.forEach(file => {
-        const cmd = `rm ${file}`;
-        console.log('cmd: ', cmd)
-        callCmd(cmd);
-    })
+    // pythonScriptFilesXml.forEach(file => {
+    //     const cmd = `sudo rm ${file}`;
+    //     console.log('cmd: ', cmd)
+    //     callCmd(cmd);
+    // })
+    // pythonScriptFilesJson.forEach(file => {
+    //     const cmd = `sudo rm ${file}`;
+    //     console.log('cmd: ', cmd)
+    //     callCmd(cmd);
+    // })
     
 }
