@@ -175,6 +175,30 @@ ls.on("close", async code => {
         if(filesProcessed === files.length) {
             console.log('174 urns', configurations);
 
+            // Copy .env file from template
+            fs.copyFile('.env-TEMPLATE', '.env', err => {
+                if (err) throw err;
+                console.log('Copied template ENV to source');
+    
+                fs.readFile('.env', 'utf8', function(err, data) {
+                    if (err) {
+                        return console.log(err);
+                    }
+                    console.log(data);
+                    console.log(config.client_id, config.client_secret, configurations.bucketKey)
+                    let result = data.replace('<FORGE_ID>', config.client_id);
+                    result = result.replace('<FORGE_SECRET>', config.client_secret);
+                    result = result.replace('<FORGE_BUCKET>', configurations.bucketKey);
+                    result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
+                    result = result.replace('<FORGE_PORT>', configurations.port ? configurations.port : '3500');
+                    console.log('res', result)
+                    // filenames.push('.env'); // ENV
+                    fs.writeFile('.env', result, 'utf8', function(err) {
+                        if (err) { console.log(err)}
+
+                    })
+                })
+            })
             // Create urns.js
             fs.copyFile('urns.js-TEMPLATE', 'urns.js', err => {
                 if (err) throw err;
@@ -193,7 +217,7 @@ ls.on("close", async code => {
                     })
                 })
                 // Translate to json files
-                translateIFCToJson();
+                // translateIFCToJson();
             })         
 
         }
@@ -319,6 +343,7 @@ function translateIFCToJson() {
     let ifCfiles = fromDir('./', /\.ifc$/, function(filename) {
         console.log('-- found: ', filename);
     });
+    // TODO: FIX MULTIPLE IFC FILES
     ifCfiles.forEach(file => {
         console.log('Replace file to json: ', file.replace('.ifc', '.json'));
         pythonScriptFilesJson.push(file.replace('.ifc', '.json')); // JSON
@@ -347,30 +372,30 @@ function ifcToJson(file, fileOutput) {
         console.log(`child process exited with code ${code}`);
 
         // Copy .env file from template
-        fs.copyFile('.env-TEMPLATE', '.env', err => {
-            if (err) throw err;
-            console.log('Copied template ENV to source');
+        // fs.copyFile('.env-TEMPLATE', '.env', err => {
+        //     if (err) throw err;
+        //     console.log('Copied template ENV to source');
 
-            fs.readFile('.env', 'utf8', function(err, data) {
-                if (err) {
-                    return console.log(err);
-                }
-                console.log(data);
-                console.log(config.client_id, config.client_secret, configurations.bucketKey)
-                let result = data.replace('<FORGE_ID>', config.client_id);
-                result = result.replace('<FORGE_SECRET>', config.client_secret);
-                result = result.replace('<FORGE_BUCKET>', configurations.bucketKey);
-                result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
-                result = result.replace('<FORGE_PORT>', configurations.port ? configurations.port : '3500');
-                console.log('res', result)
-                // filenames.push('.env'); // ENV
-                fs.writeFile('.env', result, 'utf8', function(err) {
-                    if (err) { console.log(err)}
+        //     fs.readFile('.env', 'utf8', function(err, data) {
+        //         if (err) {
+        //             return console.log(err);
+        //         }
+        //         console.log(data);
+        //         console.log(config.client_id, config.client_secret, configurations.bucketKey)
+        //         let result = data.replace('<FORGE_ID>', config.client_id);
+        //         result = result.replace('<FORGE_SECRET>', config.client_secret);
+        //         result = result.replace('<FORGE_BUCKET>', configurations.bucketKey);
+        //         result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
+        //         result = result.replace('<FORGE_PORT>', configurations.port ? configurations.port : '3500');
+        //         console.log('res', result)
+        //         // filenames.push('.env'); // ENV
+        //         fs.writeFile('.env', result, 'utf8', function(err) {
+        //             if (err) { console.log(err)}
                     
-                    uploadToS3();
-                })
-            })
-        })
+        //             uploadToS3();
+        //         })
+        //     })
+        // })
     })
 
 }
