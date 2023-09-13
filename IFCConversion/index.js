@@ -171,7 +171,7 @@ ls.on("close", async code => {
         console.log('urns: ', configurations.urns);
 
         filesProcessed++;
-        console.log('files processed: ', filesProcessed, ' ', files.length)
+        // console.log('files processed: ', filesProcessed, ' ', files.length)
         if(filesProcessed === files.length) {
             console.log('174 urns', configurations);
 
@@ -184,14 +184,14 @@ ls.on("close", async code => {
                     if (err) {
                         return console.log(err);
                     }
-                    console.log(data);
-                    console.log(config.client_id, config.client_secret, configurations.bucketKey)
+                    // console.log(data);
+                    // console.log(config.client_id, config.client_secret, configurations.bucketKey)
                     let result = data.replace('<FORGE_ID>', config.client_id);
                     result = result.replace('<FORGE_SECRET>', config.client_secret);
                     result = result.replace('<FORGE_BUCKET>', configurations.bucketKey);
                     result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
                     result = result.replace('<FORGE_PORT>', configurations.port ? configurations.port : '3500');
-                    console.log('res', result)
+                    // console.log('res', result)
                     // filenames.push('.env'); // ENV
                     fs.writeFile('.env', result, 'utf8', function(err) {
                         if (err) { console.log(err)}
@@ -219,6 +219,20 @@ ls.on("close", async code => {
                 // Translate to json files
                 // translateIFCToJson();
             })         
+            
+            let ifCfiles = fromDir('./', /\.ifc$/, function(filename) {
+                console.log('-- found: ', filename);
+            });
+            // TODO: FIX MULTIPLE IFC FILES
+            if (ifCfiles.length === 1) {
+                console.log('228 - 1 IFC file found');
+                ifCfiles.forEach(file => {
+                    console.log('Replace file to json: ', file.replace('.ifc', '.json'));
+                    pythonScriptFilesJson.push(file.replace('.ifc', '.json')); // JSON
+                    console.log('filenames from json', filetoDelete, pythonScriptFilesJson)
+                    ifcToJson(file, file.replace('.ifc', '.json'))
+                })
+            }
 
         }
     });        
@@ -392,7 +406,7 @@ function ifcToJson(file, fileOutput) {
         //         fs.writeFile('.env', result, 'utf8', function(err) {
         //             if (err) { console.log(err)}
                     
-        //             uploadToS3();
+                    uploadToS3();
         //         })
         //     })
         // })
@@ -403,24 +417,24 @@ function ifcToJson(file, fileOutput) {
 async function uploadToS3() {
 
     // Upload GLB and project config files to S3
-    filetoDelete.forEach(file => {
-        if (file.includes('.ifc.glb')) {
-            console.log('uploading: ', file)
-            const body = fs.readFileSync(file);
-            const params = {
-                Bucket: config.awsBucket,
-                Key: file,
-                Body: body
-            }
-            s3.upload(params, (err, data) => {
-                if (err) {
-                    console.log(err);
-                }
-                console.log(data);
-            })
-        }
+    // filetoDelete.forEach(file => {
+    //     if (file.includes('.ifc.glb')) {
+    //         console.log('uploading: ', file)
+    //         const body = fs.readFileSync(file);
+    //         const params = {
+    //             Bucket: config.awsBucket,
+    //             Key: file,
+    //             Body: body
+    //         }
+    //         s3.upload(params, (err, data) => {
+    //             if (err) {
+    //                 console.log(err);
+    //             }
+    //             console.log(data);
+    //         })
+    //     }
 
-    })
+    // })
     
     // PYTHON SCRIPT HERE THAT DEALS WITH XML AND JSON
     console.log('DO PYTHON SCRIPT HERE')
