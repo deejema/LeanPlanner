@@ -256,4 +256,4 @@ def main(xml_file, json_file, projName):
 if __name__ == "__main__":
     args = sys.argv[1:]
     print(args)
-    main(args[0], args[1])
+    main(args[0], args[1], args[2])
