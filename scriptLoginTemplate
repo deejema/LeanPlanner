@@ -1,0 +1,2 @@
+chmod +x ~/Lean/LeanPlanner/Login/scriptToForge
+./Lean/LeanPlanner/Login/scriptToForge
