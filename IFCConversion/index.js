@@ -42,7 +42,7 @@ if (process.argv.length && process.argv.length == 4) {
 // Run ICC to GLB Converter
 // console.log(`Running ICC to GLB Conversion BAT file`)
 // const ls = spawn("ICC_to_GLB", [], {shell:true});
-console.log('Running IFC TO GLB SCRIPT');
+console.log('Running IFC TO GLB/XML/JSON SCRIPT');
 const ls = spawn("./scriptToGlb", [], {shell:true});
 ls.stdout.on("data", data => {
     console.log(`stdout: ${data}`);
@@ -230,7 +230,7 @@ ls.on("close", async code => {
                     console.log('Replace file to json: ', file.replace('.ifc', '.json'));
                     pythonScriptFilesJson.push(file.replace('.ifc', '.json')); // JSON
                     console.log('filenames from json', filetoDelete, pythonScriptFilesJson)
-                    ifcToJson(file, file.replace('.ifc', '.json'))
+                    // ifcToJson(file, file.replace('.ifc', '.json'))
                 })
             }
 

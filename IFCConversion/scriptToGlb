@@ -1,2 +1,3 @@
 sudo find "/home/ubuntu/Lean/LeanPlanner/IFCConversion" -maxdepth 1 -name "*.ifc" -exec ./IfcConvert --use-element-guids --strict-tolerance -j 4 {} {}.glb \;
 sudo find "/home/ubuntu/Lean/LeanPlanner/IFCConversion" -maxdepth 1 -name "*.ifc" -exec ./IfcConvert --use-element-guids --strict-tolerance -j 4 {} {}.xml \;
+sudo find "/home/ubuntu/Lean/LeanPlanner/IFCConversion" -maxdepth 1 -name "*.ifc" -exec ./xeokit-metadata-linux-x64/xeokit-metadata {} {}.json \;
