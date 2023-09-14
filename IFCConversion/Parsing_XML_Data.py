@@ -200,60 +200,66 @@ with open('ICC-MEP-1F.xml', encoding="utf8") as xml_file:
     print(decomposition)
 """
 
-def main(xml_file, json_file, projName):
+def main(xml_files, json_files, projName):
+    xml_files = xml_files.split(",")
+    json_files = json_files.split(",")
+    for i in range(len(xml_files)):
+        json_file = json_files[i]
+        xml_file = xml_file[i]
+        with open(json_file) as json_file: # 'ICC-ARC-STR-17F-1702.json'
+            data = json.load(json_file)
 
-    with open(json_file) as json_file: # 'ICC-ARC-STR-17F-1702.json'
-        data = json.load(json_file)
-
-        # Print the type of data variable
-        print("Type:", type(data))
-        returnList= []
-        for sensorDict in data['metaObjects']:
-            returnList.append(sensorDict['id'])
-        print(returnList)
-
-
-    with open(xml_file, encoding="utf8") as xml_file: # 'ICC-ARC-STR-17F-1702.xml'
-        data_dict = xmltodict.parse(xml_file.read())
-        print(data_dict)
-        propertySet = data_dict['ifc']['properties']['IfcPropertySet']
-        decomposition = data_dict['ifc']['decomposition']['IfcProject']
-        print(propertySet)
-        print(decomposition)
-
-    formatDecomposition(decomposition)
-    print(formattedDecomp)
-    print(len(formattedDecomp.keys()))
-    print(len(returnList))
-    print(all(elem in formattedDecomp.keys() for elem in returnList))
-    counter = 0
-    for ele in formattedDecomp.values():
-        if isinstance(ele, list):
-            counter +=1
-    print(counter)
+            # Print the type of data variable
+            print("Type:", type(data))
+            returnList= []
+            for sensorDict in data['metaObjects']:
+                returnList.append(sensorDict['id'])
+            print(returnList)
 
 
-    formatProperties(propertySet)
-    print(len(propertySet))
-    print(len(formattedProperties.keys()))
-    print(formattedProperties)
+        with open(xml_file, encoding="utf8") as xml_file: # 'ICC-ARC-STR-17F-1702.xml'
+            data_dict = xmltodict.parse(xml_file.read())
+            print(data_dict)
+            propertySet = data_dict['ifc']['properties']['IfcPropertySet']
+            decomposition = data_dict['ifc']['decomposition']['IfcProject']
+            print(propertySet)
+            print(decomposition)
+
+        formatDecomposition(decomposition)
+        print(formattedDecomp)
+        print(len(formattedDecomp.keys()))
+        print(len(returnList))
+        print(all(elem in formattedDecomp.keys() for elem in returnList))
+        counter = 0
+        for ele in formattedDecomp.values():
+            if isinstance(ele, list):
+                counter +=1
+        print(counter)
+
+
+        formatProperties(propertySet)
+        print(len(propertySet))
+        print(len(formattedProperties.keys()))
+        print(formattedProperties)
 
 
 
-    RDSReady(formattedDecomp, formattedProperties)
-    print(RDSReadyDict)
-    print(tableAttributes)
+        RDSReady(formattedDecomp, formattedProperties)
+        print(RDSReadyDict)
+        print(tableAttributes)
 
-    print("test")
-    formatSingleTable(RDSReadyDict)
-    # createTable(tableAttributes)
-    # insertIntoRDS(RDSReadyDict)
-    singleTable(singleTableCategories, singleTableFormat, projName)
+        print("test")
+        formatSingleTable(RDSReadyDict)
+        # createTable(tableAttributes)
+        # insertIntoRDS(RDSReadyDict)
+        singleTable(singleTableCategories, singleTableFormat, projName)
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+        print("--- %s seconds ---" % (time.time() - start_time))
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
     print(args)
+    args[0] = args[0][1:len(args[0])-1]
+    args[1] = args[1][1:len(args[1])-1]
     main(args[0], args[1], args[2])
