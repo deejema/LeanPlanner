@@ -205,7 +205,7 @@ def main(xml_files, json_files, projName):
     json_files = json_files.split(",")
     for i in range(len(xml_files)):
         json_file = json_files[i]
-        xml_file = xml_file[i]
+        xml_file = xml_files[i]
         with open(json_file) as json_file: # 'ICC-ARC-STR-17F-1702.json'
             data = json.load(json_file)
 
