@@ -162,7 +162,7 @@ def singleTable(categories, data, projName):
                 columnList[i] = '`' + columnList[i] + '`'
         columns = ', '.join(columnList)
         placeholders = ', '.join(['%s'] * len(data[id]))
-        sql = "INSERT INTO `Input` ( %s ) VALUES ( {} )" % (columns)
+        sql = "INSERT INTO " + projName + " ( %s ) VALUES ( {} )` % (columns)
         valueList = list(data[id].values())
         for i in range(len(valueList)):
             valueList[i] = "'" + valueList[i] + "'"
