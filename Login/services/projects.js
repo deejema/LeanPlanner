@@ -38,11 +38,11 @@ class ProjectGenerationService {
                     // Make script for post file upload
                     const projectDirectory = `/home/ubuntu/Lean/Projects/${projectName}/`
                     const script = `echo Copying ForgeTemplate to Folder: ${projectName} 
-                    cp -r /home/ubuntu//Lean/ForgeTemplate/ ${projectDirectory}
+                    cp -r /home/ubuntu/Lean/ForgeTemplate/ ${projectDirectory}
                     mv /home/ubuntu/.env ${projectDirectory} 
                     mv /home/ubuntu/urns.js ${projectDirectory}wwwroot
                     cd
-                    ./.nvm/versions/node/v14.16.0/bin/pm2 start server.js`;
+                    ./.nvm/versions/node/v14.16.0/bin/pm2 start ${projectDirectory}server.js`;
                     fs.writeFileSync('scriptToForge', script);
                     return port;
                 }// NOTE: pm2 called from hidden folder because lambda
