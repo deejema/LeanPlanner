@@ -481,7 +481,7 @@ function sleep(ms) {
 }
 function removeAllFiles() {
     console.log('Removing all IFC, GLB, JSONs, URNS, ENV'); // MVP ONLY REMOVE GLB/IFC/JSON
-    callCmd('./scriptMoveConfigFiles'); // FOR MVP TO MOVE URNS AND ENV FILE
+    callCmd('./scriptMoveConfigFiles'); // FOR MVP TO MOVE URNS AND ENV FILE, clear everything script will not delete env/urns cause it was moved due to this
     callCmd('./clearEverythingScript') // Just delete all any traces of XML/JSON/GLB/URNS.JS/.ENV if they exist
     console.log('files to upload', filetoDelete, pythonScriptFilesXml, pythonScriptFilesJson);
     filetoDelete.forEach(file => {
