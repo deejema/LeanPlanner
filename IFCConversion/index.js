@@ -446,9 +446,9 @@ async function uploadToS3() {
     
     await sleep(5000);
 
-    callCmd(pythonCmd, true);
+    await promiseCallCmd(pythonCmd, true);
 
-    await sleep(60000);
+    // await sleep(60000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
     removeAllFiles();
 }
@@ -475,6 +475,27 @@ async function callCmd(cmdline, removeFiles = false) {
             // resolve(true);
         })
     // });
+}
+async function promiseCallCmd(cmdLine) {
+    return new Promise(resolve => {
+        
+        let cmd = spawn (cmdline, [], {shell:true});
+        cmd.stdout.on("data", data => {
+            console.log(`stdout: ${data}`);
+        });
+    
+        cmd.stderr.on("data", data => {
+            console.log(`stderr: ${data}`);
+        });
+    
+        cmd.on('error', (error) => {
+            console.log(`error: ${error.message}`);
+        });
+        cmd.on("close", code => {
+            console.log(`child process exited with code ${code}`);
+            resolve(true);
+        })
+    });
 }
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
