@@ -36,11 +36,11 @@ class ProjectGenerationService {
                     this.projects[port] = projectName;
                     
                     // Make script for post file upload
-                    const projectDirectory = `~/Lean/Projects/${projectName}/`
+                    const projectDirectory = `/home/ubuntu/Lean/Projects/${projectName}/`
                     const script = `echo Copying ForgeTemplate to Folder: ${projectName} 
-                    cp -r ~/Lean/ForgeTemplate/ ${projectDirectory}
-                    mv ~/.env ${projectDirectory} 
-                    mv ~/urns.js ${projectDirectory}wwwroot
+                    cp -r /home/ubuntu//Lean/ForgeTemplate/ ${projectDirectory}
+                    mv /home/ubuntu/.env ${projectDirectory} 
+                    mv /home/ubuntu/urns.js ${projectDirectory}wwwroot
                     cd ${projectDirectory}
                     pm2 start ${projectDirectory}server.js`;
                     fs.writeFileSync('scriptToForge', script);
