@@ -490,6 +490,19 @@ function removeAllFiles() {
         callCmd(cmd);
     })  
     
+    // Upload a trigger file so it can run the other files
+    const params = {
+        Bucket: config.awsBucket,
+        Key: 'createProj.run',
+        Body: ''
+    }
+    s3.upload(params, (err, data) => {
+        if (err) {
+            console.log(err);
+        }
+        console.log(data);
+    })
+
     // pythonScriptFilesXml.forEach(file => {
     //     const cmd = `sudo rm ${file}`;
     //     console.log('cmd: ', cmd)
