@@ -448,7 +448,7 @@ async function uploadToS3() {
 
     callCmd(pythonCmd, true);
 
-    await sleep(20000);
+    await sleep(60000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
     removeAllFiles();
 }
