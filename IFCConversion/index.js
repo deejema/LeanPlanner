@@ -447,7 +447,19 @@ async function uploadToS3() {
     await sleep(5000);
 
     await promiseCallCmd(pythonCmd, true);
-
+    
+    // Upload a trigger file so it can run the other files
+    const params = {
+        Bucket: config.awsBucket,
+        Key: 'createProj.run',
+        Body: ''
+    }
+    s3.upload(params, (err, data) => {
+        if (err) {
+            console.log(err);
+        }
+        console.log(data);
+    })
     // await sleep(60000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
     removeAllFiles();
@@ -492,7 +504,7 @@ async function promiseCallCmd(cmdline) {
             console.log(`error: ${error.message}`);
         });
         cmd.on("close", code => {
-            console.log(`child process exited with code ${code}`);
+            console.log(`promise call code ${code}`);
             resolve(true);
         })
     });
@@ -511,18 +523,7 @@ function removeAllFiles() {
         callCmd(cmd);
     })  
     
-    // Upload a trigger file so it can run the other files
-    const params = {
-        Bucket: config.awsBucket,
-        Key: 'createProj.run',
-        Body: ''
-    }
-    s3.upload(params, (err, data) => {
-        if (err) {
-            console.log(err);
-        }
-        console.log(data);
-    })
+
 
     // pythonScriptFilesXml.forEach(file => {
     //     const cmd = `sudo rm ${file}`;
