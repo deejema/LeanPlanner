@@ -476,10 +476,10 @@ async function callCmd(cmdline, removeFiles = false) {
         })
     // });
 }
-async function promiseCallCmd(cmdLine) {
+async function promiseCallCmd(cmdline) {
     return new Promise(resolve => {
         
-        let cmd = spawn (cmdline, [], {shell:true});
+        let cmd = spawn(cmdline, [], {shell:true});
         cmd.stdout.on("data", data => {
             console.log(`stdout: ${data}`);
         });
