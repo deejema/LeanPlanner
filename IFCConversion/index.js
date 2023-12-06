@@ -192,7 +192,7 @@ ls.on("close", async code => {
                     result = result.replace('<FORGE_FLOORDATA>', configurations.floorDataTable);
                     result = result.replace('<FORGE_PORT>', configurations.port ? configurations.port : '3500');
                     // console.log('res', result)
-                    // filenames.push('.env'); // ENV
+                    filetoDelete.push('.env'); // ENV
                     fs.writeFile('.env', result, 'utf8', function(err) {
                         if (err) { console.log(err)}
 
@@ -211,7 +211,7 @@ ls.on("close", async code => {
                     let urnString = configurations.urns.join(',');
                     let resUrns = data.replace('<REPLACE_URN>', urnString);
                     console.log('res', resUrns)
-                    // filenames.push('urns.js'); // URNS
+                    filetoDelete.push('urns.js'); // URNS
                     fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
                         if (err) { console.log(err)}
                     })
