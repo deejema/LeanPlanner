@@ -419,7 +419,7 @@ async function uploadToS3() {
 
     // Upload GLB and project config files to S3
     filetoDelete.forEach(file => {
-        if (file.includes('.ifc.glb')) {
+        if (file.includes('.ifc.glb') || file === '.env' || file === 'urns.js') {
             console.log('uploading: ', file)
             const body = fs.readFileSync(file);
             const params = {
@@ -446,7 +446,7 @@ async function uploadToS3() {
     
     await sleep(5000);
 
-    await promiseCallCmd(pythonCmd, true);
+    // await promiseCallCmd(pythonCmd, true);
     
     // Upload a trigger file so it can run the other files
     const params = {
