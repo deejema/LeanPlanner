@@ -45,7 +45,7 @@ if (process.argv.length && process.argv.length == 4) {
 console.log('Running IFC TO GLB/XML/JSON SCRIPT');
 const ls = spawn("./scriptToGlb", [], {shell:true});
 ls.stdout.on("data", data => {
-    console.log(`stdout: ${data}`);
+    // console.log(`stdout: ${data}`);
 });
 
 ls.stderr.on("data", data => {
@@ -57,9 +57,7 @@ ls.on('error', (error) => {
 });
 
 ls.on("close", async code => {
-    console.log(`child process exited with code ${code}`);
-
-    console.log('upload GLB here')
+    console.log(`Finished with scriptToGlb - ${code}`);
 
     //// Find all GLBs in directory
     let files = fromDir('./', /\.glb$/, function(filename) {
