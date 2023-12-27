@@ -451,18 +451,18 @@ async function uploadToS3() {
     // await promiseCallCmd(pythonCmd, true);
     
     // Upload a trigger file so it can run the other files
-    // const params = {
-    //     Bucket: config.awsBucket,
-    //     Key: 'createProj.run',
-    //     Body: ''
-    // }
-    // s3.upload(params, (err, data) => {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-    //     console.log(data);
-    // })
-    // await sleep(60000);
+    const params = {
+        Bucket: config.awsBucket,
+        Key: 'createProj.run',
+        Body: ''
+    }
+    s3.upload(params, (err, data) => {
+        if (err) {
+            console.log(err);
+        }
+        console.log(data);
+    })
+    await sleep(60000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
     removeAllFiles();
 }
