@@ -231,6 +231,8 @@ ls.on("close", async code => {
                     // ifcToJson(file, file.replace('.ifc', '.json'))
                 })
             }
+            
+            await sleep(5000);
             uploadToS3();
         }
     });        
