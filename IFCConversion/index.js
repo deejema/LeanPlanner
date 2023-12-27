@@ -416,7 +416,9 @@ function ifcToJson(file, fileOutput) {
 async function uploadToS3() {
 
     // Upload GLB and project config files to S3
+    console.log('Files to delete: ', filetoDelete);
     filetoDelete.forEach(file => {
+        console.log('file: ', file)
         if (file.includes('.ifc.glb') || file === '.env' || file === 'urns.js') {
             console.log('uploading: ', file)
             const body = fs.readFileSync(file);
@@ -447,17 +449,17 @@ async function uploadToS3() {
     // await promiseCallCmd(pythonCmd, true);
     
     // Upload a trigger file so it can run the other files
-    const params = {
-        Bucket: config.awsBucket,
-        Key: 'createProj.run',
-        Body: ''
-    }
-    s3.upload(params, (err, data) => {
-        if (err) {
-            console.log(err);
-        }
-        console.log(data);
-    })
+    // const params = {
+    //     Bucket: config.awsBucket,
+    //     Key: 'createProj.run',
+    //     Body: ''
+    // }
+    // s3.upload(params, (err, data) => {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     console.log(data);
+    // })
     // await sleep(60000);
     // REMOVE ALL FILES (GLB, Config Files, XML, JSON)
     removeAllFiles();
