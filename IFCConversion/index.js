@@ -206,7 +206,11 @@ ls.on("close", async code => {
                     if (err) {
                         return console.log(err);
                     }
-                    let urnString = configurations.urns.join(',');
+                    let urnString = '';
+                    configurations.urns.forEach(urn => {
+                        urnString += 
+                        `{urn: '${urn}', xform: {x:0,y:0,z:0}},\n`
+                    });
                     let resUrns = data.replace('<REPLACE_URN>', urnString);
                     console.log('res', resUrns)
                     filetoDelete.push('urns.js'); // URNS
