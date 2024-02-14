@@ -42,7 +42,7 @@ class ProjectGenerationService {
                     mv /home/ubuntu/.env ${projectDirectory} 
                     mv /home/ubuntu/urns.js ${projectDirectory}wwwroot
                     cd
-                    ./.nvm/versions/node/v14.16.0/bin/pm2 start ${projectDirectory}server.js`;
+                    /home/ubuntu/.nvm/versions/node/v14.16.0/bin/pm2 start ${projectDirectory}server.js`;
                     fs.writeFileSync('scriptToForge', script);
                     return port;
                 }// NOTE: pm2 called from hidden folder because lambda
