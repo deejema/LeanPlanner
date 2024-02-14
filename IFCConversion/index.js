@@ -211,7 +211,7 @@ ls.on("close", async code => {
                         urnString += 
                         `{urn: '${urn}', xform: {x:0,y:0,z:0}},\n`
                     });
-                    let resUrns = data.replace('<REPLACE_URN>', urnString);
+                    let resUrns = data.replace('<REPLACE_URNS>', urnString);
                     console.log('res', resUrns)
                     filetoDelete.push('urns.js'); // URNS
                     fs.writeFile('urns.js', resUrns, 'utf8', function(err) {
