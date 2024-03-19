@@ -78,6 +78,8 @@ def RDSReady(sensors, properties):
                     for propertySubCategory in properties[propertyID][propertyCategory]:
                         if '@Name' in propertySubCategory and '@NominalValue' in propertySubCategory:
                             propertyName = propertySubCategory['@Name']
+                            if propertyName.lower() in [x.lower() for x in RDSReadyDict[sensorKey]['[' + propertyCategory + ']']]:
+                                continue
                             """
                             if propertyName.upper() in (name.upper() for name in RDSReadyDict[sensorKey]['[' + propertyCategory + ']']) or \
                                     propertyName.upper() in (name.upper() for name in tableAttributes['[' + propertyCategory + ']']):
@@ -124,7 +126,7 @@ def insertIntoRDS(sensorDict):
                 columns = ', '.join(columnsList)
                 placeholders = ', '.join(['%s'] * len(sensorDict[sensor][category]))
                 sql = "INSERT INTO `%s` ( %s ) VALUES ( %s )" % (category, columns, placeholders)
-                print(sql)
+                print("\t\t\t" + sql)
                 cursor.execute(sql, list(sensorDict[sensor][category].values()))
         db.commit()
 
@@ -152,29 +154,46 @@ def singleTable(categories, data, projName):
         sql += sqlInput
     sql = sql[:-2]
     sql += " )"
+    print("Create table Command: {}".format(sql))
+    print("Categories: {}".format(categories))
     cursor.execute(sql)
     db.commit()
-
+    print("Done with table creattion ")
     for id in data:
-        columnList = list(data[id].keys())
-        for i in range(len(columnList)):
-            if ' ' in columnList[i] or '-' in columnList[i]:
+        try:
+            columnList = list(data[id].keys())
+            for i in range(len(columnList)):
+                # if ' ' in columnList[i] or '-' in columnList[i]:
                 columnList[i] = '`' + columnList[i] + '`'
-        columns = ', '.join(columnList)
-        placeholders = ', '.join(['%s'] * len(data[id]))
-        sql = "INSERT INTO " + projName + " ( %s ) VALUES ( {} )" % (columns)
-        valueList = list(data[id].values())
-        for i in range(len(valueList)):
-            valueList[i] = "'" + valueList[i] + "'"
-        print(valueList)
-        values = ", ".join(valueList)
-        if values:
-            sql = sql.format(values)
-            print(sql)
-            cursor.execute(sql)
+            columns = ', '.join(columnList)
+            placeholders = ', '.join(['%s'] * len(data[id]))
+            sql = "INSERT INTO " + projName + " ( %s ) VALUES ( {} )" % (columns)
+            valueList = list(data[id].values())
+            for i in range(len(valueList)):
+                valueList[i] = "'" + valueList[i] + "'"
+            print(valueList)
+            valueList = clean_values(valueList)
+            values = ", ".join(valueList)
+            if values:
+                sql = sql.format(values)
+                print("\t\t\t" + sql)
+                cursor.execute(sql)
+        except Exception as error:
+            print("Error-unable to insert item into table: {}".format(error))
     db.commit()
 
-
+def clean_values(values):
+    filter_values = [("''", "'")]
+    if not isinstance(values, list):
+        print("Not a list")
+        return values
+    for i, v in enumerate(values):
+        for filter_element in filter_values:
+            values[i] = values[i].replace(filter_element[0], filter_element[1])
+        values[i] = "'" + values[i][1:len(values[i]) - 1].replace("'", "") + "'"
+    print("Filtered Values: {}".format(values))
+    return values
+    
 def writeToJson(d):
     with open("sample.json", "w") as outfile:
         json.dump(d, outfile)
@@ -248,8 +267,9 @@ def main(xml_files, json_files, projName):
         print(RDSReadyDict)
         print(tableAttributes)
 
-        print("test")
+        print("test 1")
         formatSingleTable(RDSReadyDict)
+        print("Test 2")
         # createTable(tableAttributes)
         # insertIntoRDS(RDSReadyDict)
         singleTable(singleTableCategories, singleTableFormat, projName)
